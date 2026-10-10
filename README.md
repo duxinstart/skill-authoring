@@ -25,7 +25,7 @@ Agent Skill 是用于扩展 AI agent 能力的轻量开放格式：把「程序�
 
 ```
 .
-├── Skill目录结构规范.html      # 首页 · 总览入口
+├── index.html                  # 首页 · 总览入口（GitHub Pages 入口）
 ├── structure-detail.html       # 目录结构详解
 ├── skill-md.html               # SKILL.md 撰写指南
 ├── description.html            # 描述与触发优化
@@ -51,7 +51,7 @@ Agent Skill 是用于扩展 AI agent 能力的轻量开放格式：把「程序�
 
 | 页面 | 主题 | 主要内容 |
 |---|---|---|
-| [`Skill目录结构规范.html`](Skill目录结构规范.html) | **首页 · 总览** | 什么是 Agent Skill、渐进式加载、目录结构总览图 |
+| [`index.html`](index.html) | **首页 · 总览** | 什么是 Agent Skill、渐进式加载、目录结构总览图 |
 | [`structure-detail.html`](structure-detail.html) | 目录结构详解 | 每个目录的职责与边界 |
 | [`skill-md.html`](skill-md.html) | **SKILL.md 撰写指南** | frontmatter 详解、正文结构、写作原则、自检清单、常见错误速查 |
 | [`description.html`](description.html) | 描述与触发优化 | `description` 为何决定一切、五条写作原则、触发优化闭环 |
@@ -124,7 +124,7 @@ HTML 页面是纯静态的，直接双击打开即可。若要一次性起个本
 ```bash
 # 在项目根目录执行
 python3 -m http.server 8000
-# 然后浏览器打开 http://localhost:8000/Skill目录结构规范.html
+# 然后浏览器打开 http://localhost:8000/
 ```
 
 ---
