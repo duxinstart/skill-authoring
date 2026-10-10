@@ -174,6 +174,4 @@ git clone https://github.com/agentskills/agentskills.git
 
 ## 许可
 
-`skill-authoring` 技能包采用 **Apache-2.0**。
-
-> ⚠️ 目前仓库根目录尚未放置 `LICENSE` 文件，如需正式对外分发，建议补上一份。
+本项目采用 **Apache-2.0**，完整条款见 [LICENSE](LICENSE)。
