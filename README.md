@@ -117,6 +117,14 @@ python3 scripts/lint_description.py ./skills/pdf-processing
 
 ---
 
+## 在线预览
+
+本项目已启用 **GitHub Pages**（纯静态托管，无需构建）：
+
+**<https://duxinstart.github.io/skill-authoring/>**
+
+推送到 `main` 分支后会自动重新构建部署，通常 1–2 分钟生效。
+
 ## 本地预览
 
 HTML 页面是纯静态的，直接双击打开即可。若要一次性起个本地站点：
