@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentskills.io/schemas/skill-frontmatter.schema.json",
+  "title": "Agent Skill frontmatter",
+  "description": "Schema for the YAML frontmatter of a SKILL.md file. The field set is closed: additional properties are rejected.",
+  "type": "object",
+  "required": ["name", "description"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Kebab-case identifier. Must equal the parent directory name."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "description": "What the skill does and when to use it. Drives triggering."
+    },
+    "license": {
+      "type": "string",
+      "description": "License name or a reference to a bundled license file."
+    },
+    "compatibility": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "description": "Environment requirements (intended product, packages, network)."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Arbitrary string-to-string pairs for client-specific data.",
+      "additionalProperties": { "type": "string" }
+    },
+    "allowed-tools": {
+      "type": "string",
+      "description": "Space-separated list of pre-approved tools. Experimental."
+    }
+  }
+}

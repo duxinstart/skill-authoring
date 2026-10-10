@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>evals/ 撰写指南 · Agent Skill 规范</title>
+<link rel="stylesheet" href="skill-spec.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="inner">
+    <a class="brand" href="Skill目录结构规范.html">Agent Skill 规范 <span>/ 目录结构</span></a>
+    <nav class="topnav">
+      <a href="Skill目录结构规范.html">首页</a>
+      <a href="structure-detail.html">结构详解</a>
+      <a href="skill-md.html">SKILL.md</a>
+      <a href="description.html">描述优化</a>
+      <a href="examples.html">示例</a>
+      <a href="references.html">references/</a>
+      <a href="scripts.html">scripts/</a>
+      <a href="assets.html">assets/</a>
+      <a href="evals.html" class="active">evals/</a>
+      <a href="design.html">设计流程</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="crumb"><a href="Skill目录结构规范.html">首页</a> / evals/ 撰写指南</div>
+  <h1>evals/ 撰写指南</h1>
+  <p class="sub">技能的<b>质量测试</b>。回答"这个技能可靠吗、比没有它强多少"，并给出可迭代的反馈闭环。</p>
+
+  <!-- 定位 -->
+  <h2>1. 什么时候需要</h2>
+  <div class="card tight">
+    <ul class="tick">
+      <li>技能要<b>长期维护</b>，希望每次改动都能验证不回退。</li>
+      <li>想量化"有技能 vs 没技能"的<b>效果差异</b>。</li>
+      <li>想系统性地发现技能的盲区与歧义。</li>
+    </ul>
+    <div class="callout"><b>起步建议：</b>先写 2–3 条测试用例，别在没看到第一轮结果前过度投入。用例集可以之后扩充。</div>
+  </div>
+
+  <!-- 结构 -->
+  <h2>2. evals.json 结构</h2>
+  <p class="h2sub">放在 <code>evals/evals.json</code>，测试输入文件放 <code>evals/files/</code>。</p>
+  <div class="card tight">
+<pre>{
+  "skill_name": "csv-analyzer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a CSV in data/sales_2025.csv — find the top 3 months by revenue and make a bar chart?",
+      "expected_output": "A bar chart of the top 3 months by revenue, with labeled axes.",
+      "files": ["evals/files/sales_2025.csv"],
+      "assertions": [
+        "输出包含柱状图文件",
+        "图表恰好显示 3 个月份",
+        "两个坐标轴都有标签"
+      ]
+    }
+  ]
+}</pre>
+    <table>
+      <tr><th style="width:130px">字段</th><th>含义与写法</th></tr>
+      <tr><td><code>skill_name</code></td><td>被测技能名，与技能目录一致。</td></tr>
+      <tr><td><code>id</code></td><td>用例编号，唯一。</td></tr>
+      <tr><td><code>prompt</code></td><td><b>真实用户消息</b>——像用户真会打出来的那样（带路径、口语、错别字）。</td></tr>
+      <tr><td><code>expected_output</code></td><td>对人类可读的"成功长什么样"的描述。</td></tr>
+      <tr><td><code>files</code></td><td>用例依赖的输入文件（可选）。</td></tr>
+      <tr><td><code>assertions</code></td><td>可验证的断言列表——<b>先看到第一轮输出后再补</b>。</td></tr>
+    </table>
+  </div>
+
+  <!-- 用例设计 -->
+  <h2>3. 用例设计要点</h2>
+  <div class="card tight">
+    <ul class="tick">
+      <li><b>从 2–3 条起步</b>，别一开始就铺满。</li>
+      <li><b>变化措辞</b>：有的正式、有的随意（"hey can you clean up this csv"）、有的精确（"Parse the CSV at data/input.csv, drop rows where column B is null"）。</li>
+      <li><b>覆盖边界</b>：至少一条测异常输入、罕见请求，或技能指令可能含糊的情形。</li>
+      <li><b>用真实上下文</b>：文件路径、列名、个人背景（"我老板让我……"）。"处理一下数据"这种太含糊，测不出东西。</li>
+    </ul>
+  </div>
+
+  <!-- 断言 -->
+  <h2>4. 断言怎么写</h2>
+  <div class="card tight">
+    <h4>好的断言</h4>
+    <ul class="tick">
+      <li>"输出文件是合法 JSON"——可程序化验证。</li>
+      <li>"柱状图恰好显示 3 个月份"——具体、可计数。</li>
+      <li>"报告至少包含 3 条建议"——可数。</li>
+    </ul>
+    <h4>弱的断言</h4>
+    <ul class="tick">
+      <li>"输出质量好"——太笼统，无法判分。</li>
+      <li>"必须包含 'Total Revenue: $X' 字样"——太脆弱，措辞不同的正确输出会误判失败。</li>
+    </ul>
+    <div class="callout"><b>不是所有东西都要断言。</b>写作风格、视觉设计、"感觉对不对"这类难以拆成通过/失败的质量，留给<b>人工评审</b>。断言只用于可客观检查的东西。</div>
+  </div>
+
+  <!-- 运行 -->
+  <h2>5. 怎么运行</h2>
+  <div class="card tight">
+    <p class="muted">核心模式：每条用例<b>跑两次</b>——一次<b>带技能</b>，一次<b>不带</b>（或对上一版本），以形成对照。</p>
+    <div class="fline"><b>工作区</b><span>结果放在技能目录旁的 workspace，每轮迭代一个 <code>iteration-N/</code>；每条用例下有 <code>with_skill/</code> 与 <code>without_skill/</code>，各自含 <code>outputs/</code>、<code>timing.json</code>、<code>grading.json</code>。</span></div>
+<pre>csv-analyzer/
+├── SKILL.md
+└── evals/evals.json
+
+csv-analyzer-workspace/
+└── iteration-1/
+    ├── eval-top-months-chart/
+    │   ├── with_skill/    → outputs/ timing.json grading.json
+    │   └── without_skill/ → outputs/ timing.json grading.json
+    └── benchmark.json     <span class="c"># 聚合统计</span></pre>
+    <div class="fline"><b>隔离</b><span>每次运行都要<b>干净上下文</b>（子代理或独立会话），确保 agent 只遵循 SKILL.md。</span></div>
+    <div class="fline"><b>计时</b><span>记录 token 数与耗时，才能权衡"技能提升质量 vs 增加成本"。</span></div>
+  </div>
+
+  <!-- 判分与迭代 -->
+  <h2>6. 判分与迭代</h2>
+  <div class="card tight">
+    <div class="fline"><b>判分</b><span>逐条断言给 <b>PASS / FAIL + 具体证据</b>（引用输出，而非主观意见）。可代码检查的（合法 JSON、行数、文件存在）用脚本，更可靠。</span></div>
+    <div class="fline"><b>聚合</b><span>算出 with / without 的通过率、耗时、token，并看 <b>delta</b>——技能多花了多少、买回了多少。</span></div>
+    <div class="fline"><b>人工评审</b><span>断言只覆盖你想到的点。逐条看真实输出，记录具体反馈（"图表缺轴标签"可执行，"看起来不好"不可执行）。</span></div>
+    <div class="fline"><b>迭代</b><span>把失败断言 + 人工反馈 + 执行轨迹交给模型，请它提改进；然后在新 <code>iteration-N+1/</code> 重跑。</span></div>
+    <div class="callout good"><b>模式识别：</b>总是通过的断言没价值（删掉）；总是失败的断言可能坏了；<b>有技能通过、没技能失败的断言</b>，才是技能真正创造价值的地方。</div>
+  </div>
+
+  <footer>
+    <span><a href="assets.html">← assets/ 撰写指南</a></span>
+    <span>下一步：<a href="design.html">目录取舍与设计流程 →</a></span>
+  </footer>
+
+</div>
+</body>
+</html>

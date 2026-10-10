@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>目录结构详解 · Agent Skill 规范</title>
+<link rel="stylesheet" href="skill-spec.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="inner">
+    <a class="brand" href="Skill目录结构规范.html">Agent Skill 规范 <span>/ 目录结构</span></a>
+    <nav class="topnav">
+      <a href="Skill目录结构规范.html">首页</a>
+      <a href="structure-detail.html" class="active">结构详解</a>
+      <a href="skill-md.html">SKILL.md</a>
+      <a href="description.html">描述优化</a>
+      <a href="examples.html">示例</a>
+      <a href="references.html">references/</a>
+      <a href="scripts.html">scripts/</a>
+      <a href="assets.html">assets/</a>
+      <a href="evals.html">evals/</a>
+      <a href="design.html">设计流程</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="crumb"><a href="Skill目录结构规范.html">首页</a> / 目录结构详解</div>
+  <h1>目录结构详解</h1>
+  <p class="sub">每个文件「装什么、何时被读、为何单独拆出来」。判断标准只有一条：<b>agent 需要它时，能否凭 SKILL.md 里的触发条件准确找到并按需加载？</b></p>
+
+  <!-- SKILL.md -->
+  <div class="dirblock">
+    <div class="dirhead">
+      <div class="dirtitle"><span class="nm">SKILL.md</span><span class="badge req">必需</span></div>
+      <p class="dirpurpose">整个技能的<b>唯一入口</b>。它不做具体工作，只负责两件事：告诉 agent「这个技能是什么、什么时候用」，以及「遇到不同情况该去读哪个文件」——这就是「路由表」的含义。撰写细节见 <a class="inline" href="skill-md.html">SKILL.md 撰写指南</a>。</p>
+    </div>
+    <div class="file">
+      <div class="fhead"><span class="fname">SKILL.md</span><span class="ftag blue">入口 + 路由</span></div>
+      <div class="fline"><b>装什么</b><span>frontmatter（name / description）+ 正文：何时使用 → 快速开始 → 核心流程 → <b>资源路由表</b> → Gotchas。只放「每次运行都要用」的内容。</span></div>
+      <div class="fline"><b>何时读</b><span>技能被激活时<b>整篇</b>加载进上下文——所以必须短（&lt; 500 行 / 5000 tokens）。</span></div>
+      <div class="fline"><b>路由表</b><span>技能命脉。必须写明触发条件，例如「当任务涉及数据库时读 references/database.md」，而不是笼统的「详见 references/」。</span></div>
+      <pre><span class="c">## 资源路由表</span>
+| 当任务涉及…        | 读取                                  |
+|-------------------|---------------------------------------|
+| 数据库 / SQL       | references/database.md                |
+| 财务口径、科目     | references/finance.md                 |
+| 生成报表           | scripts/build-report.py + templates/  |
+| API 返回非 200     | references/api-errors.md              |</pre>
+    </div>
+  </div>
+
+  <!-- references -->
+  <div class="dirblock">
+    <div class="dirhead">
+      <div class="dirtitle"><span class="nm">references/</span><span class="badge opt">可选</span></div>
+      <p class="dirpurpose">技能的<b>按需知识库</b>。把长篇幅的领域知识、API 细节、边界情况从 SKILL.md 里搬出来——agent 只在路由表命中时才读。撰写细节见 <a class="inline" href="references.html">references/ 撰写指南</a>。</p>
+    </div>
+
+    <div class="file">
+      <div class="fhead"><span class="fname">REFERENCE.md</span><span class="ftag">主技术参考</span></div>
+      <div class="fline"><b>作用</b><span>技能最完整的技术说明，是 SKILL.md「简版」的<b>详版兜底</b>。SKILL.md 讲「怎么开始、何时读哪个文件」，REFERENCE.md 讲「每个细节到底是什么」。</span></div>
+      <div class="fline"><b>内容</b><span>完整 API 签名与参数表、数据结构定义、可直接运行的完整示例、配置项、边界情况清单。</span></div>
+      <div class="fline"><b>何时读</b><span>任务需要精确细节、SKILL.md 的简版说明不够用时。</span></div>
+    </div>
+
+    <div class="file">
+      <div class="fhead"><span class="fname">&lt;domain&gt;.md</span><span class="ftag">领域知识</span></div>
+      <div class="fline"><b>作用</b><span>把<b>某一垂直领域</b>的专有知识封装成独立文件。技能横跨多个领域（财务 / 法务 / 医疗…）时，<b>一个领域一个文件</b>。</span></div>
+      <div class="fline"><b>内容</b><span>该领域特有的术语、口径、规则、约定、合规红线、常见误区。例：<code>finance.md</code> = 会计科目映射 + 财报口径 + 币种/单位约定。</span></div>
+      <div class="fline"><b>何时读</b><span>任务明确落在该领域时（如"做一份财报分析" → 读 finance.md）。</span></div>
+      <div class="fline"><b>为何独立</b><span>领域知识长且互不相关，合在一起会互相干扰、白占上下文；拆开才能精准按需加载。</span></div>
+    </div>
+
+    <div class="file">
+      <div class="fhead"><span class="fname">api-errors.md</span><span class="ftag">条件触发文档</span></div>
+      <div class="fline"><b>作用</b><span>把「<b>只在特定条件下才需要</b>」的知识单独成文——平时完全不加载，出问题才读。</span></div>
+      <div class="fline"><b>内容</b><span>错误码全表、成因说明、排障步骤、重试/降级策略。</span></div>
+      <div class="fline"><b>何时读</b><span>由路由表写明触发条件，例如「当 API 返回非 200 时读取」。</span></div>
+      <div class="fline"><b>价值</b><span>就在<b>条件触发</b>——绝大多数正常运行根本用不到，正好省下上下文。</span></div>
+    </div>
+
+    <div class="file">
+      <div class="fhead"><span class="fname">FORMS.md</span><span class="ftag">结构化格式</span></div>
+      <div class="fline"><b>作用</b><span>规范点名的约定文件名，用于描述<b>表单模板或结构化数据格式</b>。</span></div>
+      <div class="fline"><b>内容</b><span>字段清单、字段类型、填写规则、校验规则。</span></div>
+      <div class="fline"><b>何时读</b><span>需要填写、解析或校验表单/结构化数据时。</span></div>
+    </div>
+  </div>
+
+  <!-- scripts -->
+  <div class="dirblock">
+    <div class="dirhead">
+      <div class="dirtitle"><span class="nm">scripts/</span><span class="badge opt">可选</span></div>
+      <p class="dirpurpose">把<b>确定性、可重复</b>的操作固化成脚本，避免 agent 每次重新「手搓」同样的逻辑。脚本比让模型现写更可靠、更省 token。撰写细节见 <a class="inline" href="scripts.html">scripts/ 撰写指南</a>。</p>
+    </div>
+
+    <div class="file">
+      <div class="fhead"><span class="fname">build-report.py</span><span class="ftag">业务脚本</span></div>
+      <div class="fline"><b>作用</b><span>完成一个具体的确定性任务（此处为生成报表）。当 agent 每次都要重复实现同一段逻辑时，就把它写成脚本。</span></div>
+      <div class="fline"><b>特征</b><span>自包含（PEP 723 内联依赖）、非交互、带 <code>--help</code>、结构化输出到 stdout、诊断信息走 stderr。</span></div>
+      <div class="fline"><b>何时运行</b><span>路由表命中「需要生成报表」时：<code>uv run scripts/build-report.py</code>。</span></div>
+    </div>
+
+    <div class="file">
+      <div class="fhead"><span class="fname">validate.sh</span><span class="ftag">校验脚本</span></div>
+      <div class="fline"><b>作用</b><span>充当「<b>验证器</b>」，支撑 validation loop：agent 做完 → 跑校验 → 失败则修复 → 重跑，直到通过。</span></div>
+      <div class="fline"><b>内容</b><span>检查产物是否符合规范 / 约束（格式、字段、必填项…）。</span></div>
+      <div class="fline"><b>要点</b><span>失败信息必须能<b>自纠</b>——指出期望值 + 可选值，例如 <code>Error: --format must be one of: json, csv, table</code>。</span></div>
+    </div>
+  </div>
+
+  <!-- assets -->
+  <div class="dirblock">
+    <div class="dirhead">
+      <div class="dirtitle"><span class="nm">assets/</span><span class="badge opt">可选</span></div>
+      <p class="dirpurpose">纯<b>静态资源</b>，不含任何逻辑。作用是让 agent 有「具体结构可参照」，比用散文描述更可靠——模型对具体结构 pattern-match 得更好。撰写细节见 <a class="inline" href="assets.html">assets/ 撰写指南</a>。</p>
+    </div>
+    <div class="file">
+      <div class="fhead"><span class="fname">templates/</span><span class="ftag">输出模板</span></div>
+      <div class="fline"><b>作用</b><span>让 agent 按固定结构产出。比用文字描述格式可靠得多。</span></div>
+      <div class="fline"><b>何时读</b><span>需要按模板输出时。<b>短模板可直接内联在 SKILL.md</b>，只有长模板或条件模板才放这里。</span></div>
+    </div>
+    <div class="file">
+      <div class="fhead"><span class="fname">schemas/</span><span class="ftag">数据结构定义</span></div>
+      <div class="fline"><b>作用</b><span>定义输入/输出的数据结构，供脚本校验、也供 agent 理解每个字段的含义与约束。</span></div>
+      <div class="fline"><b>内容</b><span>JSON Schema、字段定义、类型、必填项、取值范围。</span></div>
+    </div>
+    <div class="file">
+      <div class="fhead"><span class="fname">data/</span><span class="ftag">查找表</span></div>
+      <div class="fline"><b>作用</b><span>存放静态映射数据，供 agent 或脚本查询，避免把大表硬编码进 SKILL.md 或脚本。</span></div>
+      <div class="fline"><b>内容</b><span>国家/地区代码、币种、状态码映射、枚举字典、行业分类等。</span></div>
+    </div>
+  </div>
+
+  <!-- evals -->
+  <div class="dirblock">
+    <div class="dirhead">
+      <div class="dirtitle"><span class="nm">evals/</span><span class="badge opt">可选</span></div>
+      <p class="dirpurpose">技能的<b>质量测试</b>。回答「这个技能可靠吗、比没有它强多少」。来自官方《评测技能》指南的约定。撰写细节见 <a class="inline" href="evals.html">evals/ 撰写指南</a>。</p>
+    </div>
+    <div class="file">
+      <div class="fhead"><span class="fname">evals.json</span><span class="ftag">测试用例 + 断言</span></div>
+      <div class="fline"><b>作用</b><span>定义测试用例：每条含一句真实提示词、期望结果、以及可验证的断言。</span></div>
+      <div class="fline"><b>何时读</b><span>开发/迭代技能时用来跑评测——不参与技能的正常运行。</span></div>
+    </div>
+    <div class="file">
+      <div class="fhead"><span class="fname">files/</span><span class="ftag">测试输入</span></div>
+      <div class="fline"><b>作用</b><span>存放测试用例所依赖的输入文件（样例 CSV、PDF 等）。</span></div>
+      <div class="fline"><b>要点</b><span>起步 2–3 条即可；提示词要真实（带路径、口语、错别字），并覆盖边界情况。</span></div>
+    </div>
+  </div>
+
+  <!-- 给人看 -->
+  <div class="dirblock">
+    <div class="dirhead">
+      <div class="dirtitle"><span class="nm">README.md · LICENSE · CHANGELOG.md</span><span class="badge hum">给人看</span></div>
+      <p class="dirpurpose">规范允许技能目录里放任意文件。这些是<b>给维护者看的</b>，<b>不参与渐进式加载</b>——agent 不会读它们。</p>
+    </div>
+    <div class="file">
+      <div class="fhead"><span class="fname">README.md</span><span class="ftag gray">维护者说明</span></div>
+      <div class="fline"><b>作用</b><span>技能背景、安装方式、贡献指南、设计取舍。</span></div>
+      <div class="fline"><b>陷阱</b><span><b>不要把该给 agent 的指令写进 README.md</b>——模型根本不读它。</span></div>
+    </div>
+    <div class="file">
+      <div class="fhead"><span class="fname">LICENSE / CHANGELOG.md</span><span class="ftag gray">合规与版本</span></div>
+      <div class="fline"><b>作用</b><span>LICENSE 声明许可证（可在 frontmatter 的 <code>license</code> 字段引用）；CHANGELOG.md 记录版本变更。</span></div>
+    </div>
+  </div>
+
+  <footer>
+    <span><a href="Skill目录结构规范.html">← 返回首页</a></span>
+    <span>下一步：<a href="skill-md.html">SKILL.md 撰写指南 →</a></span>
+  </footer>
+
+</div>
+</body>
+</html>

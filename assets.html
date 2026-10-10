@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>assets/ 撰写指南 · Agent Skill 规范</title>
+<link rel="stylesheet" href="skill-spec.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="inner">
+    <a class="brand" href="Skill目录结构规范.html">Agent Skill 规范 <span>/ 目录结构</span></a>
+    <nav class="topnav">
+      <a href="Skill目录结构规范.html">首页</a>
+      <a href="structure-detail.html">结构详解</a>
+      <a href="skill-md.html">SKILL.md</a>
+      <a href="description.html">描述优化</a>
+      <a href="examples.html">示例</a>
+      <a href="references.html">references/</a>
+      <a href="scripts.html">scripts/</a>
+      <a href="assets.html" class="active">assets/</a>
+      <a href="evals.html">evals/</a>
+      <a href="design.html">设计流程</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="crumb"><a href="Skill目录结构规范.html">首页</a> / assets/ 撰写指南</div>
+  <h1>assets/ 撰写指南</h1>
+  <p class="sub">纯静态资源，不含任何逻辑。作用是给 agent 提供「具体的结构可参照」——模型对具体结构 pattern-match 得比散文描述好得多。</p>
+
+  <!-- 三类 -->
+  <h2>1. 三类静态资源</h2>
+  <div class="card tight">
+    <table>
+      <tr><th style="width:120px">子目录</th><th style="width:140px">装什么</th><th>用途</th></tr>
+      <tr><td><code>templates/</code></td><td>输出模板</td><td>让 agent 按固定结构产出（报告、邮件、配置）。</td></tr>
+      <tr><td><code>schemas/</code></td><td>数据结构定义</td><td>JSON Schema 等，供脚本校验、供 agent 理解字段约束。</td></tr>
+      <tr><td><code>data/</code></td><td>静态查找表</td><td>国家代码、币种、状态码映射、枚举字典。</td></tr>
+    </table>
+  </div>
+
+  <!-- templates -->
+  <h2>2. templates/ —— 输出模板</h2>
+  <div class="card tight">
+    <div class="fline"><b>作用</b><span>要固定输出格式时给模板，比用散文描述可靠——模型照着具体结构填，不易跑偏。</span></div>
+    <div class="fline"><b>何时读</b><span>需要按模板输出时。由 SKILL.md 路由表指明。</span></div>
+    <h4>何时内联 vs 外置</h4>
+    <ul class="tick">
+      <li><b>短模板</b> → 直接内联在 <code>SKILL.md</code> 里（省一次文件加载）。</li>
+      <li><b>长模板 / 只在特定情况才用的模板</b> → 放 <code>assets/templates/</code>，按需加载。</li>
+    </ul>
+    <h4>示例：templates/report.md</h4>
+<pre># [分析标题]
+
+## 摘要
+[一段话概述关键发现]
+
+## 关键发现
+- 发现 1，附支撑数据
+- 发现 2，附支撑数据
+
+## 建议
+1. 具体可执行的建议
+2. 具体可执行的建议</pre>
+    <div class="callout"><b>在 SKILL.md 里怎么用：</b>"按 <code>assets/templates/report.md</code> 的结构输出报告，按需调整小节。"</div>
+  </div>
+
+  <!-- schemas -->
+  <h2>3. schemas/ —— 数据结构定义</h2>
+  <div class="card tight">
+    <div class="fline"><b>作用</b><span>定义输入/输出的结构，供<b>脚本校验</b>、也供 agent 理解每个字段的类型与约束。</span></div>
+    <div class="fline"><b>何时读</b><span>需要构造或解析结构化数据、或校验其合法性时。</span></div>
+    <h4>示例：schemas/field_values.schema.json</h4>
+<pre>{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["customer_name", "order_total"],
+  "properties": {
+    "customer_name": { "type": "string", "minLength": 1 },
+    "order_total":   { "type": "number", "minimum": 0 },
+    "signature_date":{ "type": "string", "format": "date" }
+  },
+  "additionalProperties": false
+}</pre>
+    <div class="callout good"><b>好处：</b>脚本可拿它自动校验；agent 也能从 <code>required</code> 与类型约束推断"哪些字段不能缺、该填什么格式"。</div>
+  </div>
+
+  <!-- data -->
+  <h2>4. data/ —— 静态查找表</h2>
+  <div class="card tight">
+    <div class="fline"><b>作用</b><span>存放静态映射数据，避免把大表<b>硬编码</b>进 SKILL.md 或脚本——既省上下文，又便于单独维护。</span></div>
+    <div class="fline"><b>何时读</b><span>需要做映射 / 查表时（路由表写"需要币种换算时读 assets/data/currencies.json"）。</span></div>
+    <h4>示例：data/currencies.json</h4>
+<pre>{
+  "CNY": { "name": "人民币", "symbol": "¥", "decimals": 2 },
+  "USD": { "name": "美元",   "symbol": "$", "decimals": 2 },
+  "JPY": { "name": "日元",   "symbol": "¥", "decimals": 0 }
+}</pre>
+    <div class="callout warn"><b>判断标准：</b>这张表会不会变、大不大？<b>会变或很大</b> → 放 <code>data/</code>；<b>很小且固定</b>（如三五个状态码）→ 直接内联在正文里更省事。</div>
+  </div>
+
+  <!-- 组织 -->
+  <h2>5. 组织与命名</h2>
+  <div class="card tight">
+    <div class="fline"><b>命名</b><span>小写、kebab-case；模板带明确后缀（<code>report.md</code>、<code>email.md</code>），schema 用 <code>*.schema.json</code>。</span></div>
+    <div class="fline"><b>路径</b><span>相对技能根目录，如 <code>assets/templates/report.md</code>。</span></div>
+    <div class="fline"><b>一层</b><span>保持一层子目录（templates / schemas / data）；不要再往下嵌套。</span></div>
+    <div class="fline"><b>触发</b><span>每个资源都要在路由表里写明"何时用"。</span></div>
+  </div>
+
+  <!-- 反模式 -->
+  <h2>6. 反模式</h2>
+  <div class="card tight">
+    <ul class="tick">
+      <li><b>把很小的固定表也塞进 assets/</b> → 三五个条目直接内联即可，别为它加一次文件加载。</li>
+      <li><b>模板里混入业务逻辑</b> → assets 只放静态结构，逻辑归 scripts。</li>
+      <li><b>资源没有触发条件</b> → 永不被加载。</li>
+      <li><b>图片/数据文件无说明</b> → 至少让文件名自解释，或在路由表里说明用途。</li>
+    </ul>
+  </div>
+
+  <footer>
+    <span><a href="scripts.html">← scripts/ 撰写指南</a></span>
+    <span>下一步：<a href="evals.html">evals/ 撰写指南 →</a></span>
+  </footer>
+
+</div>
+</body>
+</html>

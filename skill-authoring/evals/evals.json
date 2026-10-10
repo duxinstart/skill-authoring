@@ -1,0 +1,39 @@
+{
+  "skill_name": "skill-authoring",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我建一个新的 skill，叫 weekly-report，用来从一堆材料里汇总出周报。目录就放在 ./skills 下面。",
+      "expected_output": "在 ./skills/weekly-report/ 下生成技能骨架：SKILL.md（含 frontmatter 与正文骨架）以及 references/、scripts/、assets/ 子目录。",
+      "files": [],
+      "assertions": [
+        "创建了目录 ./skills/weekly-report/",
+        "该目录下存在 SKILL.md",
+        "SKILL.md 的 frontmatter 中 name 等于 weekly-report",
+        "同时创建了 references/、scripts/、assets/ 三个子目录"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "我按文档写了个 skill，但 skills-ref validate 一直报错，你能帮我看看哪里不对吗？目录在 examples/my-skill。",
+      "expected_output": "运行校验、定位具体错误（如 name 与目录名不一致、或出现未定义字段），并给出可执行的修复建议。",
+      "files": ["evals/files/my-skill/SKILL.md"],
+      "assertions": [
+        "实际运行了校验（而非仅凭猜测）",
+        "指出的错误与文件中的真实问题一致",
+        "给出了具体的修复方式（改哪个字段、改成什么）"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "我这个 skill 写好了，但感觉它从来不会被触发，怎么改？",
+      "expected_output": "检查 description，指出触发相关的问题（如缺少「何时用」的表述、过短、缺关键词），并给出改写后的描述。",
+      "files": ["evals/files/my-skill/SKILL.md"],
+      "assertions": [
+        "检查了 description 字段",
+        "指出了至少一处影响触发的具体问题",
+        "给出了改写后的 description，且长度不超过 1024 字符"
+      ]
+    }
+  ]
+}

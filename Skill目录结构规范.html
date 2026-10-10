@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Skill 目录结构规范</title>
+<link rel="stylesheet" href="skill-spec.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="inner">
+    <a class="brand" href="Skill目录结构规范.html">Agent Skill 规范 <span>/ 目录结构</span></a>
+    <nav class="topnav">
+      <a href="Skill目录结构规范.html" class="active">首页</a>
+      <a href="structure-detail.html">结构详解</a>
+      <a href="skill-md.html">SKILL.md</a>
+      <a href="description.html">描述优化</a>
+      <a href="examples.html">示例</a>
+      <a href="references.html">references/</a>
+      <a href="scripts.html">scripts/</a>
+      <a href="assets.html">assets/</a>
+      <a href="evals.html">evals/</a>
+      <a href="design.html">设计流程</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>Agent Skill 目录结构规范</h1>
+    <p class="sub">一个技能 = 一个文件夹，核心是 <code>SKILL.md</code>。其余目录按需组织、按需加载。本页是总览入口，详细写法见各子页。</p>
+  </div>
+
+  <h2>什么是 Agent Skill</h2>
+  <p class="muted">Skill 是用于扩展 AI agent 能力的轻量开放格式。它把「程序性知识」和「团队/项目专有上下文」打包成可移植、可版本化的文件夹，agent 按需加载。加载遵循<b>渐进式披露</b>：启动时只读 <code>name</code> + <code>description</code>（约 100 tokens），任务命中时才读整篇 <code>SKILL.md</code>（建议 &lt; 5000 tokens），其余资源（脚本、参考、模板）在真正引用时才加载。</p>
+
+  <h2>目录结构总览</h2>
+  <div class="legend">
+    <span><i class="dot req"></i>必需</span>
+    <span><i class="dot opt"></i>可选（按需加载）</span>
+    <span><i class="dot hum"></i>给人看（不进模型上下文）</span>
+  </div>
+  <div class="card">
+    <ul class="tree">
+      <li>
+        <div class="row"><span class="nm root">skill-name/</span><span class="desc">技能根目录 · 目录名 = 技能名（kebab-case）</span></div>
+        <ul>
+          <li><div class="row"><span class="nm">SKILL.md</span><span class="badge req">必需</span><span class="desc">入口 + 资源路由表（&lt; 500 行 / 5000 tokens）</span></div></li>
+          <li>
+            <div class="row"><span class="nm">references/</span><span class="badge opt">可选</span><span class="desc">按需加载的知识库</span></div>
+            <ul>
+              <li><div class="row"><span class="nm">REFERENCE.md</span><span class="desc">主技术参考</span></div></li>
+              <li><div class="row"><span class="nm">&lt;domain&gt;.md</span><span class="desc">领域知识（finance.md / legal.md …）</span></div></li>
+              <li><div class="row"><span class="nm">api-errors.md</span><span class="desc">条件触发的主题文档</span></div></li>
+              <li><div class="row"><span class="nm">FORMS.md</span><span class="desc">表单 / 结构化数据格式</span></div></li>
+            </ul>
+          </li>
+          <li>
+            <div class="row"><span class="nm">scripts/</span><span class="badge opt">可选</span><span class="desc">可执行脚本 · 确定性操作</span></div>
+            <ul>
+              <li><div class="row"><span class="nm">build-report.py</span><span class="desc">业务脚本（自包含）</span></div></li>
+              <li><div class="row"><span class="nm">validate.sh</span><span class="desc">校验脚本</span></div></li>
+            </ul>
+          </li>
+          <li>
+            <div class="row"><span class="nm">assets/</span><span class="badge opt">可选</span><span class="desc">静态资源</span></div>
+            <ul>
+              <li><div class="row"><span class="nm">templates/</span><span class="desc">输出模板</span></div></li>
+              <li><div class="row"><span class="nm">schemas/</span><span class="desc">数据结构定义</span></div></li>
+              <li><div class="row"><span class="nm">data/</span><span class="desc">查找表</span></div></li>
+            </ul>
+          </li>
+          <li>
+            <div class="row"><span class="nm">evals/</span><span class="badge opt">可选</span><span class="desc">评测</span></div>
+            <ul>
+              <li><div class="row"><span class="nm">evals.json</span><span class="desc">测试用例 + 断言</span></div></li>
+              <li><div class="row"><span class="nm">files/</span><span class="desc">测试输入文件</span></div></li>
+            </ul>
+          </li>
+          <li><div class="row"><span class="nm">README.md</span><span class="badge hum">给人看</span><span class="desc">维护者说明</span></div></li>
+          <li><div class="row"><span class="nm">LICENSE</span><span class="badge hum">给人看</span><span class="desc">许可证</span></div></li>
+          <li><div class="row"><span class="nm">CHANGELOG.md</span><span class="badge hum">给人看</span><span class="desc">版本记录</span></div></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <h2>详细说明</h2>
+  <p class="h2sub">点击卡片进入对应子页。建议阅读顺序：结构详解 → SKILL.md → 描述优化 → 完整示例 → 各资源目录 → 设计流程。</p>
+  <div class="cards">
+    <a class="navcard" href="structure-detail.html">
+      <span class="tag">总览</span>
+      <h3>目录结构详解</h3>
+      <p>每个文件「装什么、何时被读、为何单独拆出来」——含 references、scripts、assets、evals 全部条目。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="skill-md.html">
+      <span class="tag">核心</span>
+      <h3>SKILL.md 撰写指南</h3>
+      <p>frontmatter 逐字段详解、正文六部分结构、写作原则、常用模式、交付前自检清单。全文三色标注硬性/建议/实验性。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="description.html">
+      <span class="tag">触发</span>
+      <h3>描述与触发优化</h3>
+      <p>description 决定技能能否被触发。含五条写作原则、好差对照，以及完整的触发优化闭环（查询集、触发率、训练/验证切分）。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="examples.html">
+      <span class="tag">实战</span>
+      <h3>完整示例：skill-authoring</h3>
+      <p>一个真实技能从最小版逐阶段长成完整版的全过程，含完整目录总览与可手动执行的验证步骤。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="references.html">
+      <span class="tag">资源</span>
+      <h3>references/ 撰写指南</h3>
+      <p>REFERENCE.md、&lt;domain&gt;.md、条件触发文档、FORMS.md 的内容模板与写法。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="scripts.html">
+      <span class="tag">资源</span>
+      <h3>scripts/ 撰写指南</h3>
+      <p>自包含依赖、非交互、--help、错误自纠、结构化输出与 stdout/stderr 分流，附完整脚本骨架。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="assets.html">
+      <span class="tag">资源</span>
+      <h3>assets/ 撰写指南</h3>
+      <p>templates / schemas / data 三类静态资源各自装什么、怎么组织、何时内联 vs 外置。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="evals.html">
+      <span class="tag">质量</span>
+      <h3>evals/ 撰写指南</h3>
+      <p>evals.json 结构逐字段详解、用例设计、断言好坏对照、运行与迭代方式。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="design.html">
+      <span class="tag">方法</span>
+      <h3>目录取舍与设计流程</h3>
+      <p>每个目录「什么时候才需要」，以及从最小可用到完整结构的六步演进路径。</p>
+      <span class="go">查看 →</span>
+    </a>
+  </div>
+
+  <footer>
+    <span>依据 agentskills.io 规范整理 · 大技能 = 薄 SKILL.md（路由）+ 厚的按需资源</span>
+    <span><a href="design.html">下一步：目录取舍与设计流程 →</a></span>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>描述与触发优化 · Agent Skill 规范</title>
+<link rel="stylesheet" href="skill-spec.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="inner">
+    <a class="brand" href="Skill目录结构规范.html">Agent Skill 规范 <span>/ 目录结构</span></a>
+    <nav class="topnav">
+      <a href="Skill目录结构规范.html">首页</a>
+      <a href="structure-detail.html">结构详解</a>
+      <a href="skill-md.html">SKILL.md</a>
+      <a href="description.html" class="active">描述优化</a>
+      <a href="examples.html">示例</a>
+      <a href="references.html">references/</a>
+      <a href="scripts.html">scripts/</a>
+      <a href="assets.html">assets/</a>
+      <a href="evals.html">evals/</a>
+      <a href="design.html">设计流程</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="crumb"><a href="Skill目录结构规范.html">首页</a> / 描述与触发优化</div>
+  <h1>描述与触发优化</h1>
+  <p class="sub"><code>description</code> 是 agent 决定「要不要加载这个技能」的<b>唯一依据</b>。写得窄，该触发时不触发；写得宽，不该触发时乱触发。本页讲清怎么写、以及如何系统性地把触发率调上去。</p>
+
+  <div class="legend-mk" style="margin-top:14px">
+    <span><i class="mk hard">硬性</i>违反会被官方校验器拒绝</span>
+    <span><i class="mk advice">建议</i>官方最佳实践</span>
+  </div>
+
+  <!-- 1. 触发机制 -->
+  <h2>1. 为什么 description 决定一切</h2>
+  <div class="card tight">
+    <p class="muted">回顾渐进式加载：会话启动时，agent 只读到每个技能的 <code>name</code> + <code>description</code>（约 50–100 tokens / 个）。只有当用户任务与描述匹配，agent 才会把整篇 <code>SKILL.md</code> 读进上下文。</p>
+    <div class="callout"><b>结论：描述独自承担了全部触发责任。</b>如果描述没有传达出"何时有用"，agent 就不知道要去找它——技能写得再好也没用。</div>
+
+    <h4>一个容易忽略的前提</h4>
+    <p class="muted">agent 通常只对<b>超出自身能力</b>的任务才去查技能。像"读这个 PDF"这种一步就能做的事，即便描述完全匹配，也可能不触发——因为 agent 用基础工具就能完成。<b>真正需要专门知识的场景</b>（不熟悉的 API、领域流程、罕见格式），才是描述发挥作用的地方。</p>
+
+    <h4>硬性约束</h4>
+    <div class="fline"><b>长度</b><span><i class="mk hard">硬性</i>1–1024 字符，非空。描述在优化过程中容易越写越长，记得回头检查。</span></div>
+  </div>
+
+  <!-- 2. 五条原则 -->
+  <h2>2. 五条写作原则</h2>
+  <div class="card tight">
+    <ul class="tick">
+      <li><b>用祈使句</b><i class="mk advice" style="margin-left:8px">建议</i><br>写成给 agent 的指令——"当用户……时<b>使用本技能</b>"，而不是"本技能可以……"。agent 是在决定"要不要行动"。</li>
+      <li><b>写用户意图，不写内部实现</b><br>匹配的是用户的话，不是你的实现细节。写"用户想达成什么"，而不是"技能内部怎么算"。</li>
+      <li><b>宁可"主动"一点</b><br>显式列出适用场景，包括用户<b>没直接点名</b>的情况——"即使用户没有明确提到 CSV 或分析"。</li>
+      <li><b>带上可检索关键词</b><br>领域术语、同义词、常见口语说法，都写进去。</li>
+      <li><b>保持简短</b><br>几句话到一小段——够覆盖范围，又不至于在多个技能间撑爆上下文。</li>
+    </ul>
+  </div>
+
+  <!-- 3. 好差对照 -->
+  <h2>3. 好 / 差对照</h2>
+  <div class="card tight">
+<pre><span class="c"># 差 —— 太笼统，不知道何时用</span>
+description: 帮助处理 PDF。
+
+<span class="c"># 差 —— 只说了做什么，没说何时用</span>
+description: 一个提取 PDF 文本的工具。
+
+<span class="c"># 差 —— 罗列实现细节，用户不会这么说</span>
+description: 调用 pdfplumber 解析页面对象并遍历提取文本。
+
+<span class="c"># 好 —— 做什么 + 何时用 + 关键词 + 主动覆盖</span>
+description: >
+  提取 PDF 文本与表格、填写 PDF 表单、合并多个 PDF。
+  当用户处理 PDF 文档，或提到 PDF、表单、文档提取时使用本技能，
+  即使用户没有明确说"提取"。</pre>
+    <div class="callout good"><b>对照着看：</b>好的版本既<b>更具体地</b>说了做什么（提取/填表/合并），又<b>更宽地</b>覆盖了何时用（PDF、表单、文档提取；即便没点名关键词）。</div>
+  </div>
+
+  <!-- 4. 优化闭环 -->
+  <h2>4. 触发优化闭环</h2>
+  <p class="h2sub">当技能该触发却不触发、或不该触发却乱触发时，用这套方法来系统性地调，而不是凭感觉改词。</p>
+
+  <div class="card tight">
+    <h3>4.1 设计一组测试查询</h3>
+    <p class="muted">约 <b>20 条</b>：8–10 条应触发，8–10 条不应触发。存成 JSON。</p>
+<pre>[
+  { "query": "我有个 ~/data/q4.xlsx，C 列是营收、D 列是成本，帮我加一列利润率", "should_trigger": true },
+  { "query": "把 json 转成 yaml 最快的方法是什么", "should_trigger": false }
+]</pre>
+
+    <h4>应触发的查询：多变化</h4>
+    <ul class="tick">
+      <li><b>措辞</b>：有的正式、有的随意、有的带错别字或缩写。</li>
+      <li><b>明示程度</b>：有的直接点名领域（"分析这个 CSV"），有的只描述需求（"老板要我从这个数据文件出张图"）。</li>
+      <li><b>详略</b>：一句话的短提示，与带路径、列名、背景的长提示都要有。</li>
+      <li><b>复杂度</b>：单步任务与多步工作流都要覆盖。</li>
+    </ul>
+    <div class="callout"><b>最有价值的应触发查询</b>，是那些"技能确实有用、但光看查询不明显"的——因为那正是描述措辞能起决定作用的地方。</div>
+
+    <h4>不应触发的查询：找"近似项"</h4>
+    <p class="muted">最有用的是 <b>near-miss</b>——共享关键词或概念、但实际需要别的东西的查询。以"CSV 分析"技能为例：</p>
+    <table>
+      <tr><th style="width:50%">弱负例（测不出东西）</th><th>强负例（有价值）</th></tr>
+      <tr>
+        <td><code>"写个斐波那契函数"</code><br><span class="muted">毫不相关</span></td>
+        <td><code>"帮我改一下 Excel 预算表里的公式"</code><br><span class="muted">共享"表格"概念，但要的是 Excel 编辑，不是 CSV 分析</span></td>
+      </tr>
+      <tr>
+        <td><code>"今天天气怎么样？"</code><br><span class="muted">无关键词重叠</span></td>
+        <td><code>"写个 python 脚本把 csv 每行上传到 postgres"</code><br><span class="muted">涉及 CSV，但任务是数据库 ETL，不是分析</span></td>
+      </tr>
+    </table>
+
+    <h4>让查询更真实</h4>
+    <p class="muted">真实用户会带上：文件路径（<code>~/Downloads/report_final_v2.xlsx</code>）、个人背景（"我经理让我……"）、具体细节（列名、公司名、数值）、口语与错别字。</p>
+  </div>
+
+  <div class="card tight">
+    <h3>4.2 计算触发率</h3>
+    <p class="muted">模型行为有随机性——同一查询可能这次触发、下次不触发。所以每条查询要<b>跑多次</b>（建议 3 次），算出<b>触发率</b>＝被调用次数 / 总次数。</p>
+    <table>
+      <tr><th style="width:40%">查询类型</th><th>判定</th></tr>
+      <tr><td>应触发（should_trigger = true）</td><td>触发率 <b>&gt; 0.5</b> 算通过</td></tr>
+      <tr><td>不应触发（should_trigger = false）</td><td>触发率 <b>&lt; 0.5</b> 算通过</td></tr>
+    </table>
+    <div class="callout"><b>怎么判断"触发了没"？</b>看 agent 是否加载了你的 <code>SKILL.md</code>。多数客户端提供执行日志、工具调用记录或 verbose 输出，可据此判断。</div>
+  </div>
+
+  <div class="card tight">
+    <h3>4.3 切分训练集 / 验证集</h3>
+    <p class="muted">如果拿<b>全部</b>查询来调描述，会过拟合——调出一版只对这批措辞有效、换个说法就失效的描述。</p>
+    <div class="fline"><b>训练集</b><span>约 60%。用来发现问题、指导修改。</span></div>
+    <div class="fline"><b>验证集</b><span>约 40%。<b>先放一边</b>，只在最后检验改动是否泛化。</span></div>
+    <div class="callout warn">两组都要含应触发与不应触发的合理比例，别把正例全塞进一组。切分固定，别每次重洗。</div>
+  </div>
+
+  <div class="card tight">
+    <h3>4.4 迭代循环</h3>
+    <div class="steps">
+      <div class="step">
+        <h4>评估</h4>
+        <p>在<b>训练集和验证集</b>上都跑一遍。训练集结果指导改动；验证集结果告诉你改动是否泛化。</p>
+      </div>
+      <div class="step">
+        <h4>只在训练集上找失败项</h4>
+        <p>哪些应触发的没触发？哪些不应触发的触发了？<b>只用训练集的失败来指导修改</b>，把验证集结果排除在决策之外。</p>
+      </div>
+      <div class="step">
+        <h4>修改描述，聚焦泛化</h4>
+        <p>
+          · 应触发却失败 → 描述太<b>窄</b>，扩大范围或补充"何时有用"。<br>
+          · 不应触发却误触 → 描述太<b>宽</b>，补上"不做什么"或划清与相邻能力的边界。<br>
+          · <b>不要</b>把失败查询里的具体词照抄进去——那是过拟合；要提炼出它代表的<b>一般类别</b>。<br>
+          · 若几轮都卡住，换一个<b>结构性不同的写法</b>（换框架、换句式），而非继续微调。<br>
+          · 别忘了检查是否还在 1024 字符以内。
+        </p>
+      </div>
+      <div class="step">
+        <h4>重复</h4>
+        <p>直到训练集全部通过，或不再有明显改善。一般 5 轮就够。</p>
+      </div>
+      <div class="step">
+        <h4>按验证集选出最佳版本</h4>
+        <p>以<b>验证集通过率</b>为准。注意：最佳版本往往<b>不是最后一版</b>——后面几版可能已经过拟合训练集了。</p>
+      </div>
+    </div>
+    <div class="callout warn">如果一直不改善，问题可能出在<b>查询集本身</b>（太简单、太难，或标注错了），而不是描述。</div>
+  </div>
+
+  <!-- 5. 应用 -->
+  <h2>5. 应用与最终验证</h2>
+  <div class="card tight">
+    <div class="steps">
+      <div class="step"><h4>更新</h4><p>把选中的版本写回 <code>SKILL.md</code> 的 <code>description</code> 字段。</p></div>
+      <div class="step"><h4>确认长度</h4><p>确认不超过 1024 字符。</p></div>
+      <div class="step"><h4>独立检验</h4><p>再写 <b>5–10 条全新查询</b>（应触发与不应触发混合），跑一遍——它们从未参与优化，能给出诚实的泛化检验。</p></div>
+    </div>
+  </div>
+
+  <!-- 6. 自检清单 -->
+  <h2>6. 描述自检清单</h2>
+  <div class="card tight">
+    <ul class="checklist">
+      <li>同时写了<b>「做什么」</b>与<b>「何时用」</b></li>
+      <li>用了祈使句（"当……时使用本技能"），而非陈述句</li>
+      <li>写的是<b>用户意图</b>，不是内部实现细节</li>
+      <li>显式覆盖了用户<b>没直接点名</b>的场景</li>
+      <li>含有便于检索的<b>关键词 / 同义词</b></li>
+      <li>长度 ≤ <b>1024</b> 字符，且不至于短到缺乏上下文</li>
+      <li>用真实查询跑过，确认<b>该触发的会触发、不该触发的不会</b></li>
+    </ul>
+  </div>
+
+  <footer>
+    <span><a href="skill-md.html">← SKILL.md 撰写指南</a></span>
+    <span>下一步：<a href="examples.html">完整示例 →</a></span>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>目录取舍与设计流程 · Agent Skill 规范</title>
+<link rel="stylesheet" href="skill-spec.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="inner">
+    <a class="brand" href="Skill目录结构规范.html">Agent Skill 规范 <span>/ 目录结构</span></a>
+    <nav class="topnav">
+      <a href="Skill目录结构规范.html">首页</a>
+      <a href="structure-detail.html">结构详解</a>
+      <a href="skill-md.html">SKILL.md</a>
+      <a href="description.html">描述优化</a>
+      <a href="examples.html">示例</a>
+      <a href="references.html">references/</a>
+      <a href="scripts.html">scripts/</a>
+      <a href="assets.html">assets/</a>
+      <a href="evals.html">evals/</a>
+      <a href="design.html" class="active">设计流程</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="crumb"><a href="Skill目录结构规范.html">首页</a> / 目录取舍与设计流程</div>
+  <h1>目录取舍与设计流程</h1>
+  <p class="sub">除了 <code>SKILL.md</code>，其余全部可选。<b>按需增加，不要预先堆。</b>目录不是"设计出来"的，是"长出来的"。</p>
+
+  <!-- 决策表 -->
+  <h2>1. 什么时候需要哪个目录</h2>
+  <div class="card tight">
+    <table>
+      <tr><th style="width:140px">目录 / 文件</th><th style="width:70px">必需性</th><th>什么时候才需要它</th></tr>
+      <tr><td><code>SKILL.md</code></td><td><span class="badge req">必需</span></td><td>永远需要。没有它就不是一个技能。</td></tr>
+      <tr><td><code>references/</code></td><td><span class="badge opt">可选</span></td><td>当 <code>SKILL.md</code> 会超过 500 行 / 5000 tokens，或存在"只有特定情况才用得上"的详细知识（领域规则、API 细节、错误表）时。</td></tr>
+      <tr><td><code>scripts/</code></td><td><span class="badge opt">可选</span></td><td>当存在<b>确定性、可重复、agent 每次都要重新实现</b>的操作时（解析格式、生成图表、校验产物）。</td></tr>
+      <tr><td><code>assets/</code></td><td><span class="badge opt">可选</span></td><td>当需要<b>固定的输出模板</b>、<b>数据结构定义</b>，或<b>静态查找表</b>时。</td></tr>
+      <tr><td><code>evals/</code></td><td><span class="badge opt">可选</span></td><td>当技能需要<b>长期维护、验证质量</b>，或要与"没有技能时"对比效果时。</td></tr>
+      <tr><td><code>README.md</code><br><code>LICENSE</code><br><code>CHANGELOG.md</code></td><td><span class="badge hum">给人看</span></td><td>当技能要<b>对外发布 / 团队共享 / 版本化管理</b>时。它们<b>不进模型上下文</b>。</td></tr>
+    </table>
+    <div class="callout"><b>一句话原则：</b>当某类内容多到撑不住 <code>SKILL.md</code>，或某段逻辑反复被重写，就把它拆出去。</div>
+  </div>
+
+  <!-- 演进路径 -->
+  <h2>2. 六步演进路径</h2>
+  <p class="h2sub">不要一开始就规划完整目录树。从最小可用开始，用真实任务驱动拆分。</p>
+  <div class="card">
+    <div class="steps">
+      <div class="step">
+        <h4>只写 SKILL.md</h4>
+        <p>从最小形态起步：frontmatter + 何时使用 + 核心流程。能跑通一个真实任务就够了。</p>
+      </div>
+      <div class="step">
+        <h4>在真实任务中试用</h4>
+        <p>拿真实提示词跑几遍，观察 agent 的表现与执行轨迹，记录它做错、绕路、重复的地方。</p>
+      </div>
+      <div class="step">
+        <h4>内容变长 → 拆出 references/</h4>
+        <p>当 SKILL.md 逼近 500 行，把"详细知识"移出去，并在 SKILL.md 留一张<b>路由表</b>指明何时加载。</p>
+      </div>
+      <div class="step">
+        <h4>逻辑重复 → 加 scripts/</h4>
+        <p>若发现 agent 每次都重写同一段逻辑（建图表、解析格式、校验输出），就把它写成经过测试的脚本。</p>
+      </div>
+      <div class="step">
+        <h4>格式要固定 → 加 assets/</h4>
+        <p>需要稳定的输出结构或静态数据时，加 templates / schemas / data。</p>
+      </div>
+      <div class="step">
+        <h4>要长期维护 → 加 evals/</h4>
+        <p>用测试用例 + 断言锁定质量，之后每次改动都跑一遍，确保不回退。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 三个判断问题 -->
+  <h2>3. 设计时的三个判断问题</h2>
+  <div class="card tight">
+    <ul class="tick">
+      <li><b>这块内容"每次都要用"还是"偶尔才用"？</b><br>每次都用 → 留在 SKILL.md；偶尔才用 → 拆出去 + 在路由表里给触发条件。</li>
+      <li><b>这段操作"每次都要重做"吗？</b><br>是 → 写成脚本，别再让模型现写。</li>
+      <li><b>删掉这个文件，agent 会做错吗？</b><br>不会 → 它可能根本不需要存在。<b>警惕过度设计。</b></li>
+    </ul>
+  </div>
+
+  <!-- 反模式 -->
+  <h2>4. 常见反模式</h2>
+  <div class="card tight">
+    <ul class="tick">
+      <li><b>一开始就铺满完整目录树</b> → 大部分目录会空着，纯属负担。</li>
+      <li><b>为"以后可能用到"而预留目录</b> → 用不到就是噪音。</li>
+      <li><b>SKILL.md 与 references/ 内容重复</b> → 浪费上下文，还容易不同步。</li>
+      <li><b>资源文件没有触发条件</b> → 永远不会被加载，等于不存在。</li>
+      <li><b>把主流程也拆进 references/</b> → 主干必须留在 SKILL.md，拆走的只能是细节。</li>
+    </ul>
+  </div>
+
+  <footer>
+    <span><a href="Skill目录结构规范.html">← 返回首页</a></span>
+    <span>建议接着读：<a href="skill-md.html">SKILL.md 撰写指南 →</a></span>
+  </footer>
+
+</div>
+</body>
+</html>

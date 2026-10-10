@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SKILL.md 撰写指南 · Agent Skill 规范</title>
+<link rel="stylesheet" href="skill-spec.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="inner">
+    <a class="brand" href="Skill目录结构规范.html">Agent Skill 规范 <span>/ 目录结构</span></a>
+    <nav class="topnav">
+      <a href="Skill目录结构规范.html">首页</a>
+      <a href="structure-detail.html">结构详解</a>
+      <a href="skill-md.html" class="active">SKILL.md</a>
+      <a href="description.html">描述优化</a>
+      <a href="examples.html">示例</a>
+      <a href="references.html">references/</a>
+      <a href="scripts.html">scripts/</a>
+      <a href="assets.html">assets/</a>
+      <a href="evals.html">evals/</a>
+      <a href="design.html">设计流程</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="crumb"><a href="Skill目录结构规范.html">首页</a> / SKILL.md 撰写指南</div>
+  <h1>SKILL.md 撰写指南</h1>
+  <p class="sub">它是技能的唯一入口，被激活时<b>整篇</b>载入上下文。本页从零讲清它的每一部分该怎么写——读完你应当能独立写出一个合规、可用的 <code>SKILL.md</code>。</p>
+
+  <!-- ========== 1. 阅读须知 ========== -->
+  <h2>1. 阅读须知</h2>
+  <div class="card tight">
+    <div class="callout">
+      <b>一句话原则：调度信息必须完整、清晰；冗余必须剔除。</b>
+      这两件事常被混为一谈。「精简」的对象是<b>冗余</b>——agent 早已知道的通用知识、只有特定情况才用到的细节；<b>不是</b>调度所需的必要信息。SKILL.md 是全局调度文档，<b>激活条件、核心流程、资源路由、关键约束都必须写清楚</b>；为了"短"而删掉必要的调度说明，是错误的方向。
+    </div>
+    <p class="muted">官方对篇幅的态度是<b>建议</b>、不是硬性：正文建议 <b>&lt; 5000 tokens / &lt; 500 行</b>（<code>specification.mdx</code>）。同时 <code>best-practices</code> 提醒：技能被激活后正文<b>整篇</b>进入上下文，每个 token 都在与对话历史、其他技能争夺注意力，「过度全面的技能弊大于利」。所以正确做法既不是"越短越好"，也不是"越多越好"，而是——<b>把调度所需的写清楚，把冗余的删掉</b>。</p>
+
+    <h4>关于本页内容的出处</h4>
+    <p class="muted">本页内容分三类来源：<b>官方硬性要求</b>（如 frontmatter 字段约束）、<b>官方建议</b>（如写作原则，来自 <code>best-practices</code>）、以及<b>实践经验归纳</b>（如后文的「建议模板」）。凡属第三类，文中都会明确写出「这是建议、非官方要求」，请勿当作规范。</p>
+
+    <h4>本页的三种标记</h4>
+    <div class="legend-mk">
+      <span><i class="mk hard">硬性</i>违反会被官方校验器拒绝</span>
+      <span><i class="mk advice">建议</i>官方最佳实践，不做不报错但效果差</span>
+      <span><i class="mk exp">实验性</i>客户端支持不一，谨慎使用</span>
+    </div>
+  </div>
+
+  <!-- ========== 2. 定位与心智模型 ========== -->
+  <h2>2. 定位与心智模型</h2>
+  <div class="card tight">
+    <h4>一个比喻：SKILL.md 是「前台接待」</h4>
+    <p class="muted">它不亲自干活。它只做两件事：<b>确认来意</b>（这个技能是干什么的、什么时候该用），以及<b>指引去处</b>（遇到不同情况该去读哪个文件）。真正的工作由正文流程、<code>scripts/</code>、<code>references/</code> 完成。</p>
+
+    <h4>它什么时候被读</h4>
+    <table>
+      <tr><th style="width:80px">层级</th><th style="width:170px">加载内容</th><th>时机与预算</th></tr>
+      <tr><td>元数据</td><td><code>name</code> + <code>description</code></td><td>会话启动时加载<b>全部</b>技能——约 50–100 tokens / 个，只够判断相关性。</td></tr>
+      <tr><td><b>指令</b></td><td><b>整篇 <code>SKILL.md</code> 正文</b></td><td><b>技能被激活时</b>加载——官方<b>建议</b> &lt; 5000 tokens / &lt; 500 行（非硬性门槛）。</td></tr>
+      <tr><td>资源</td><td><code>scripts/</code> <code>references/</code> <code>assets/</code></td><td>正文引用到、且任务需要时才逐个加载。</td></tr>
+    </table>
+
+    <h4>由此推出两条原则</h4>
+    <ul class="tick">
+      <li><b>调度信息必须完整清晰</b>——激活条件、核心流程、资源路由、关键约束，一个都不能省。</li>
+      <li><b>偶尔才用的细节外置</b>——并在流程中写明「走到哪一步、读哪份文件」。</li>
+    </ul>
+  </div>
+
+  <!-- ========== 3. frontmatter ========== -->
+  <h2>3. frontmatter 详解</h2>
+  <p class="h2sub"><code>SKILL.md</code> 必须以 YAML frontmatter 开头（首行 <code>---</code>），后接 Markdown 正文。字段是一个<b>封闭集合</b>，多一个都会失败。</p>
+
+  <div class="card tight">
+    <table>
+      <tr><th style="width:130px">字段</th><th style="width:70px">必需性</th><th>一句话说明</th></tr>
+      <tr><td><code>name</code></td><td><span class="badge req">必需</span></td><td>技能标识，<b>必须等于父目录名</b></td></tr>
+      <tr><td><code>description</code></td><td><span class="badge req">必需</span></td><td>决定技能能否被触发</td></tr>
+      <tr><td><code>license</code></td><td><span class="badge opt">可选</span></td><td>许可证</td></tr>
+      <tr><td><code>compatibility</code></td><td><span class="badge opt">可选</span></td><td>环境要求</td></tr>
+      <tr><td><code>metadata</code></td><td><span class="badge opt">可选</span></td><td>自定义键值对</td></tr>
+      <tr><td><code>allowed-tools</code></td><td><span class="badge opt">可选</span></td><td>预授权工具列表（<b>实验性</b>）</td></tr>
+    </table>
+
+    <div class="field">
+      <h4><code>name</code> <i class="mk hard">硬性</i></h4>
+      <div class="fline"><b>是什么</b><span>技能的标识符，同时也是它在磁盘上的目录名。</span></div>
+      <div class="fline"><b>约束</b><span>1–64 字符；仅小写字母、数字、连字符；不可首尾为连字符；不可含连续连字符 <code>--</code>；<b>必须等于父目录名</b>。</span></div>
+      <div class="fline"><b>建议</b><span>用 kebab-case 的动宾短语，如 <code>pdf-processing</code>、<code>code-review</code>。</span></div>
+      <div class="fline"><b>常见错误</b><span>① 改名时只改了目录或只改了字段；② 用了大写或下划线；③ 用中文名——校验前会做 NFKC 规范化，非 ASCII 字符不在允许集合内。</span></div>
+<pre><span class="c"># 合法</span>
+name: pdf-processing
+
+<span class="c"># 非法</span>
+name: PDF-Processing      <span class="c"># 含大写</span>
+name: -pdf                <span class="c"># 以连字符开头</span>
+name: pdf--processing     <span class="c"># 连续连字符</span></pre>
+    </div>
+
+    <div class="field">
+      <h4><code>description</code> <i class="mk hard">硬性</i></h4>
+      <div class="fline"><b>是什么</b><span>agent 决定「要不要加载这个技能」的<b>唯一依据</b>。</span></div>
+      <div class="fline"><b>约束</b><span>1–1024 字符，非空。</span></div>
+      <div class="fline"><b>建议</b><span>同时说清「做什么」与「何时用」，并带上便于检索的关键词。</span></div>
+      <div class="fline"><b>常见错误</b><span>只写"做什么"不写"何时用"——技能将<b>永不触发</b>。</span></div>
+<pre><span class="c"># 差</span>
+description: 帮助处理 PDF。
+
+<span class="c"># 好</span>
+description: >
+  提取 PDF 文本与表格、填写表单、合并多个 PDF。
+  当用户处理 PDF 文档，或提到 PDF、表单、文档提取时使用本技能，
+  即使用户没有明确说"提取"。</pre>
+      <p class="muted">描述是触发成败的关键，值得单独深入。完整方法（含触发优化闭环）见 <a class="inline" href="description.html">描述与触发优化</a>。</p>
+    </div>
+
+    <div class="field">
+      <h4><code>license</code> <i class="mk hard">硬性</i></h4>
+      <div class="fline"><b>是什么</b><span>技能适用的许可证。</span></div>
+      <div class="fline"><b>建议</b><span>保持简短——写许可证名，或指向随附的许可证文件。</span></div>
+<pre>license: Apache-2.0
+<span class="c"># 或</span>
+license: Proprietary. LICENSE.txt has complete terms</pre>
+    </div>
+
+    <div class="field">
+      <h4><code>compatibility</code> <i class="mk hard">硬性</i></h4>
+      <div class="fline"><b>是什么</b><span>技能的环境要求（目标产品、依赖包、网络等）。</span></div>
+      <div class="fline"><b>约束</b><span>若提供，1–500 字符。</span></div>
+      <div class="fline"><b>建议</b><span><b>只在确实有特定环境要求时才写</b>——多数技能不需要这个字段。</span></div>
+<pre>compatibility: Requires Python 3.12+ and uv
+compatibility: Requires git, docker, jq, and access to the internet</pre>
+    </div>
+
+    <div class="field">
+      <h4><code>metadata</code> <i class="mk hard">硬性</i></h4>
+      <div class="fline"><b>是什么</b><span>string → string 的键值对，用来放规范未定义、但你想保留的信息。</span></div>
+      <div class="fline"><b>建议</b><span>键名取得独特一些，避免与其他客户端冲突。</span></div>
+      <div class="fline"><b>常见错误</b><span>把 <code>version</code>、<code>author</code> 直接写成顶层字段——那会被判为未定义字段而失败。<b>它们属于 <code>metadata</code></b>。</span></div>
+<pre>metadata:
+  author: example-org
+  version: "1.0"</pre>
+    </div>
+
+    <div class="field">
+      <h4><code>allowed-tools</code> <i class="mk exp">实验性</i></h4>
+      <div class="fline"><b>是什么</b><span>空格分隔的、预授权可直接运行的工具列表。</span></div>
+      <div class="fline"><b>注意</b><span>这是<b>实验性</b>字段，各客户端支持程度不一。不要把它当成硬依赖。</span></div>
+<pre>allowed-tools: Bash(git:*) Bash(jq:*) Read</pre>
+    </div>
+
+    <div class="callout warn"><b>白名单警告：</b>frontmatter 是封闭字段集。出现上表之外的任何字段，官方校验器会直接判失败。需要自定义信息，一律放进 <code>metadata</code>。</div>
+  </div>
+
+  <!-- ========== 4. 正文结构 ========== -->
+  <h2>4. 正文结构</h2>
+
+  <div class="card tight">
+    <h4>先看官方口径</h4>
+    <div class="callout">
+      <b>官方对正文格式没有强制要求。</b><code>specification.mdx</code> 原文：<i>"There are no format restrictions. Write whatever helps agents perform the task effectively."</i>
+      官方只<b>推荐</b>了三类内容：<b>分步指令、输入/输出示例、常见边界情况</b>。
+    </div>
+    <p class="muted">换句话说：<b>不存在「必须包含哪几个部分」的官方规定。</b>下面给的是一个<b>建议模板</b>——来自实践经验归纳，<b>非官方要求</b>。请按技能规模与类型增删，不要机械照抄。</p>
+  </div>
+
+  <div class="card tight">
+    <h4>建议模板（非官方要求，可增删）</h4>
+    <table>
+      <tr><th style="width:150px">组成部分</th><th style="width:110px">何时需要</th><th>说明</th></tr>
+      <tr><td><b>激活条件 & 适用边界</b></td><td>建议常有</td><td>确认「找对了技能」，并划清<b>不适用</b>的范围。与 frontmatter 的 <code>description</code> 呼应，但不重复。</td></tr>
+      <tr><td><b>核心流程</b></td><td>几乎必备</td><td>主干。<b>资源路由就嵌在流程里</b>——走到某一步、需要读哪份文档，在该步直接写明。</td></tr>
+      <tr><td><b>关键规则 / 约束</b></td><td>建议常有</td><td>必须遵守的硬约束、红线，以及反直觉的 Gotchas。</td></tr>
+      <tr><td><b>身份设定</b></td><td>按需</td><td>只在需要<b>稳定角色或语气</b>时才有价值（如审阅、写作类技能）。对简单技能是纯 token 浪费——<b>不是必备项</b>。</td></tr>
+      <tr><td><b>快速开始</b></td><td>按需</td><td>技能较复杂时，给一条最短的可跑路径。</td></tr>
+      <tr><td><b>校验循环</b></td><td>按需</td><td>产出有客观对错标准时，让 agent 自检。</td></tr>
+    </table>
+    <div class="callout warn"><b>规模决定取舍。</b>一个"掷骰子"技能只需核心流程；一个大型技能才需要把上面几乎全部写齐。<b>不要因为模板列了 6 项就都写上。</b></div>
+    <div class="callout"><b>特殊技能追加。</b>某些领域需要额外部分：<b>写作类</b>常需追加「协作规范 / 铁律」；<b>数据类</b>常需追加「口径定义」。追加什么，取决于该领域最容易出错的地方。</div>
+  </div>
+
+  <div class="card tight">
+    <h4>三处重点，写法示例</h4>
+
+    <h3>激活条件 & 适用边界</h3>
+    <div class="fline"><b>作用</b><span>让 agent 确认「找对了」，并排除不该用的情况。</span></div>
+<pre>## 何时使用
+当用户提供财务数据（CSV / Excel / 数据库导出）并希望得到分析
+结论或成文报告时。**不适用**于：单纯的格式转换、数据录入。</pre>
+
+    <h3>核心流程（含资源路由）</h3>
+    <div class="fline"><b>作用</b><span>技能主干。资源路由直接嵌在每一步里——agent 走到哪一步，就知道该读什么。</span></div>
+    <div class="fline"><b>写法</b><span>脆弱、必须严格顺序的步骤写成强制命令；灵活处给原则、解释"为什么"。</span></div>
+<pre>## 核心流程
+1. 读数据，识别期间与科目
+2. 计算核心指标 —— 公式细节见 `references/REFERENCE.md`
+3. 按 `assets/templates/report.md` 输出报告
+4. 交付前运行 `scripts/validate_report.py`；
+   若报错，按 `references/data-errors.md` 排查</pre>
+    <div class="callout"><b>也可以另给一张汇总路由表</b>便于总览——但<b>流程里的路由不能省</b>，因为那才是 agent 真正会照着走的地方。</div>
+
+    <h3>关键规则 / Gotchas</h3>
+    <div class="fline"><b>作用</b><span>往往是整篇<b>价值最高</b>的部分——记录反直觉、环境特有的坑。</span></div>
+    <div class="fline"><b>写法</b><span>具体到"不加这条 agent 就会做错"的事实，而非"要妥善处理错误"这类空话。</span></div>
+<pre>## Gotchas
+- 金额单位可能是元或万元，**务必先确认**，否则指标差 10000 倍。
+- 部分数据用软删除，统计前需过滤 `deleted_at IS NULL`。
+- 环比需要上期数据；若缺失，**明确说明而非默认填 0**。</pre>
+  </div>
+
+  <!-- ========== 5. 写作原则 ========== -->
+  <h2>5. 写作原则</h2>
+  <p class="h2sub">这些是<b>建议</b>而非硬性要求——但它们决定了技能是"能用"还是"好用"。</p>
+
+  <div class="card tight">
+    <h3>A · 内容从哪来</h3>
+    <div class="fline"><b>从真实专长出发</b><span>别只让模型凭通用知识生成——那样得到的是"妥善处理错误"这类空话。要么<b>从一次真实任务里提取</b>（记录成功的步骤、你的纠正、输入输出格式、你补充的背景），要么<b>从项目制品里合成</b>（内部文档、runbook、API 规范、代码评审意见、事故报告）。</span></div>
+    <div class="fline"><b>用真实执行迭代</b><span>初稿几乎都要打磨。拿真实任务跑一遍，把结果（不只是失败）反馈回来：什么被误触发？漏了什么？哪些可以砍？<b>读执行轨迹，不只看最终输出</b>——如果 agent 在绕路，通常是指令太含糊、或塞了不适用于当前任务的条目。</span></div>
+
+    <h3>B · 写多少</h3>
+    <div class="fline"><b>只写 agent 不知道的</b><span>项目特有约定、领域流程、非显然的边界情况、该用哪个工具。不必解释"PDF 是什么""HTTP 怎么工作"。</span></div>
+    <div class="fline"><b>适度详细</b><span>过度全面的技能<b>弊大于利</b>——agent 会难以提取相关部分，甚至被不适用的指令带偏。<b>简洁的分步指引 + 一个可用示例，胜过面面俱到的文档。</b></span></div>
+    <div class="fline"><b>设计内聚单元</b><span>决定技能覆盖什么，就像决定一个函数该做什么：要封装<b>一个连贯的工作单元</b>。太窄会迫使多个技能同时加载；太宽又难以被精确触发。"查询数据库并格式化结果"是一个连贯单元，"外加数据库运维"就过宽了。</span></div>
+
+    <h3>C · 怎么写</h3>
+    <div class="fline"><b>给默认值，不给菜单</b><span>多个方案都行时，挑一个默认 + 简短提一句备选，别并列罗列让模型纠结。</span></div>
+    <div class="fline"><b>讲流程，不讲答案</b><span>教 agent「如何应对这一类问题」，而非「这次该输出什么」。细节可以具体，但方法要能泛化。</span></div>
+    <div class="fline"><b>按脆弱性校准</b><span>任务灵活 → 给自由 + 解释"为什么"；操作脆弱、必须一致 → 写死命令（"严格按此序列，不要改参数"）。同一个技能里，不同部分可以不同力度。</span></div>
+  </div>
+
+  <!-- ========== 6. 常用模式 ========== -->
+  <h2>6. 常用内容模式</h2>
+  <p class="h2sub">可复用的结构技巧，按需取用——不是每个技能都需要全部。</p>
+  <div class="card tight">
+    <div class="fline"><b>Gotchas 清单</b><span>环境特有的反直觉事实。每次纠正 agent 的错误后，都把纠正补进来——这是最直接的迭代方式。</span></div>
+    <div class="fline"><b>输出模板</b><span>要固定格式时给模板（比散文描述可靠）。短模板内联在正文；长模板/条件模板放 <code>assets/</code> 并在路由表引用。</span></div>
+    <div class="fline"><b>进度清单</b><span>多步且有依赖时，用可勾选清单帮 agent 跟踪、防止跳步。</span></div>
+    <div class="fline"><b>校验循环</b><span>"做 → 校验 → 修 → 重跑"，用脚本或参考清单当验证器。</span></div>
+    <div class="fline"><b>先规划后执行</b><span>批量/破坏性操作：先生成中间计划 → 对照事实源校验 → 通过后才执行。关键是那步"校验"。</span></div>
+    <div class="fline"><b>何时把逻辑写成脚本</b><span>若发现 agent 每次都重写同一段逻辑（建图表、解析格式、校验输出），就该把它固化成经过测试的脚本。</span></div>
+<pre>## 表单填写（先规划后执行）
+1. 提取表单字段 → form_fields.json
+2. 生成 field_values.json（字段 → 目标值）
+3. 校验：validate_fields.py（检查字段存在、类型兼容、必填不缺）
+4. 失败则改 field_values.json 重校
+5. 通过后填写 → output.pdf</pre>
+  </div>
+
+  <!-- ========== 7. 自检清单 ========== -->
+  <h2>7. 交付前自检清单</h2>
+  <div class="card tight">
+    <h4>frontmatter</h4>
+    <ul class="checklist">
+      <li><code>name</code> 与目录名<b>完全一致</b>，且全小写、无连续连字符</li>
+      <li><code>description</code> 同时写了「做什么」与「何时用」，且 ≤1024 字符</li>
+      <li>没有出现<b>白名单之外</b>的字段（<code>version</code> / <code>author</code> 等应放进 <code>metadata</code>）</li>
+      <li>有环境要求时，已在 <code>compatibility</code> 中声明</li>
+    </ul>
+    <h4>正文</h4>
+    <ul class="checklist">
+      <li><b>调度信息完整</b>：激活条件、核心流程、关键约束都已写清</li>
+      <li><b>资源路由清晰</b>：流程的每一步都指明了需要读哪份文档</li>
+      <li><b>冗余已剔除</b>：没有解释 agent 已知的通用知识，没有保留只有特定情况才用的细节</li>
+      <li>文件引用用相对路径，且只<b>一层深</b></li>
+      <li>给的是默认方案，而非并列菜单</li>
+      <li>脆弱步骤写成了强制指令，灵活步骤给了原则</li>
+      <li>（可选）篇幅：官方<b>建议</b> &lt; 5000 tokens / &lt; 500 行；明显超出时，优先把细节移入 <code>references/</code></li>
+    </ul>
+    <h4>整体</h4>
+    <ul class="checklist">
+      <li>用真实任务跑过一遍，并据结果做过至少一轮修正</li>
+      <li>确认技能被正确触发（见 <a class="inline" href="description.html">描述与触发优化</a>）</li>
+    </ul>
+  </div>
+
+  <!-- ========== 8. 常见错误 ========== -->
+  <h2>8. 常见错误速查</h2>
+  <div class="card tight">
+    <table>
+      <tr><th style="width:44%">错误</th><th>后果 / 纠正</th></tr>
+      <tr><td><b>为了"短"而删掉必要的调度信息</b></td><td>agent 不知道要做什么、读什么 → 调度信息必须完整；精简的对象是<b>冗余</b></td></tr>
+      <tr><td>把偶尔才用的细节塞进正文</td><td>白占上下文 → 移到 <code>references/</code>，并在流程中写明何时读</td></tr>
+      <tr><td>只写"详见 references/"</td><td>agent 不知道何时加载 → 必须写触发条件</td></tr>
+      <tr><td>解释通用知识（"PDF 是一种文件格式…"）</td><td>纯浪费上下文 → 删</td></tr>
+      <tr><td>并列罗列一堆工具/方案</td><td>模型纠结 → 改成"默认 + 备选"</td></tr>
+      <tr><td>把给 agent 的指令写进 <code>README.md</code></td><td>模型不读它 → 指令必须进 <code>SKILL.md</code></td></tr>
+      <tr><td><code>description</code> 只写"做什么"</td><td>技能永不触发 → 补上"何时用"</td></tr>
+      <tr><td>自创 frontmatter 字段</td><td>校验直接失败 → 放进 <code>metadata</code></td></tr>
+      <tr><td><code>name</code> 与目录名不一致</td><td>校验失败 → 二者改成一致</td></tr>
+      <tr><td>技能覆盖范围过大</td><td>难以被精确触发 → 拆成多个内聚技能</td></tr>
+    </table>
+  </div>
+
+  <!-- ========== 9. 延伸阅读 ========== -->
+  <h2>9. 延伸阅读</h2>
+  <div class="cards">
+    <a class="navcard" href="description.html">
+      <span class="tag">下一篇</span>
+      <h3>描述与触发优化</h3>
+      <p>description 决定技能能否被触发。含触发优化闭环：查询集、触发率、训练/验证切分。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="examples.html">
+      <span class="tag">实战</span>
+      <h3>完整示例：skill-authoring</h3>
+      <p>跟着一个真实技能从最小版逐阶段长成完整版，看这些原则如何落地。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="structure-detail.html">
+      <span class="tag">回顾</span>
+      <h3>目录结构详解</h3>
+      <p>references / scripts / assets / evals 各自装什么、何时被读。</p>
+      <span class="go">查看 →</span>
+    </a>
+  </div>
+
+  <footer>
+    <span><a href="structure-detail.html">← 目录结构详解</a></span>
+    <span>下一步：<a href="description.html">描述与触发优化 →</a></span>
+  </footer>
+
+</div>
+</body>
+</html>

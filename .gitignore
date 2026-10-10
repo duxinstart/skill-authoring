@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# WorkBuddy 本地数据
+.workbuddy-ai/
+
+# 上游参考资料（agentskills/agentskills 的 clone，不纳入本仓库）
+agentskills/

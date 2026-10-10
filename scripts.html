@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>scripts/ 撰写指南 · Agent Skill 规范</title>
+<link rel="stylesheet" href="skill-spec.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="inner">
+    <a class="brand" href="Skill目录结构规范.html">Agent Skill 规范 <span>/ 目录结构</span></a>
+    <nav class="topnav">
+      <a href="Skill目录结构规范.html">首页</a>
+      <a href="structure-detail.html">结构详解</a>
+      <a href="skill-md.html">SKILL.md</a>
+      <a href="description.html">描述优化</a>
+      <a href="examples.html">示例</a>
+      <a href="references.html">references/</a>
+      <a href="scripts.html" class="active">scripts/</a>
+      <a href="assets.html">assets/</a>
+      <a href="evals.html">evals/</a>
+      <a href="design.html">设计流程</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="crumb"><a href="Skill目录结构规范.html">首页</a> / scripts/ 撰写指南</div>
+  <h1>scripts/ 撰写指南</h1>
+  <p class="sub">把确定性、可重复的操作固化成脚本。脚本比让模型每次现写更可靠、更省 token，也更易测试。</p>
+
+  <!-- 何时写 -->
+  <h2>1. 什么时候该写脚本</h2>
+  <div class="card tight">
+    <ul class="tick">
+      <li><b>agent 每次都在重写同一段逻辑</b>（建图表、解析特定格式、校验输出）——这是最直接的信号。</li>
+      <li>操作<b>确定性、可重复</b>，不该每次由模型即兴发挥。</li>
+      <li>一段命令<b>复杂到一次难以写对</b>，不如固化成经过测试的脚本。</li>
+    </ul>
+    <div class="callout"><b>反例：</b>只是调用一个带几个 flag 的现成工具（如 <code>npx eslint@9 --fix .</code>）——直接写在 SKILL.md 里即可，不必建脚本。</div>
+  </div>
+
+  <!-- 自包含 -->
+  <h2>2. 自包含：让一条命令就能跑</h2>
+  <p class="h2sub">脚本应<b>自带依赖声明</b>，agent 无需额外的 manifest 或安装步骤。</p>
+  <div class="card tight">
+    <table>
+      <tr><th style="width:90px">语言</th><th style="width:170px">依赖声明方式</th><th>运行</th></tr>
+      <tr><td>Python</td><td>PEP 723 内联 TOML（<code># /// script</code>）</td><td><code>uv run scripts/x.py</code>（或 pipx）</td></tr>
+      <tr><td>Deno</td><td><code>npm:</code> / <code>jsr:</code> 导入前缀</td><td><code>deno run scripts/x.ts</code></td></tr>
+      <tr><td>Bun</td><td>导入路径内联版本（<code>cheerio@1.0.0</code>）</td><td><code>bun run scripts/x.ts</code></td></tr>
+      <tr><td>Ruby</td><td><code>bundler/inline</code> 的 <code>gemfile do</code></td><td><code>ruby scripts/x.rb</code></td></tr>
+      <tr><td>Node</td><td>需 <code>package.json</code>（非自包含）</td><td>优先用上面几种</td></tr>
+    </table>
+    <div class="callout warn"><b>固定版本</b>（如 <code>"beautifulsoup4&gt;=4.12,&lt;5"</code>），让命令长期行为一致。运行时依赖写进 frontmatter 的 <code>compatibility</code>。</div>
+  </div>
+
+  <!-- 非交互 -->
+  <h2>3. 禁止交互式提示（硬要求）</h2>
+  <div class="card tight">
+    <p class="muted">agent 在<b>非交互 shell</b> 中运行——无法响应 TTY 提示、密码框、确认菜单。任何阻塞式等待都会<b>永久挂起</b>。所有输入必须通过命令行 flag、环境变量或 stdin 提供。</p>
+<pre><span class="c"># 差 —— 挂起等待输入</span>
+$ python scripts/deploy.py
+Target environment: _
+
+<span class="c"># 好 —— 缺参时给出清晰错误与用法</span>
+$ python scripts/deploy.py
+Error: --env is required. Options: development, staging, production.
+Usage: python scripts/deploy.py --env staging --tag v1.2.3</pre>
+  </div>
+
+  <!-- --help -->
+  <h2>4. 用 --help 交代接口</h2>
+  <div class="card tight">
+    <p class="muted"><code>--help</code> 是 agent 了解脚本接口的<b>主要途径</b>。要简短（它会进入上下文），但包含描述、全部 flag 与用法示例。</p>
+<pre>Usage: scripts/process.py [OPTIONS] INPUT_FILE
+
+处理输入数据并生成摘要报告。
+
+Options:
+  --format FORMAT   输出格式: json, csv, table（默认 json）
+  --output FILE     写入文件而非 stdout
+  --verbose         将进度打印到 stderr
+
+Examples:
+  scripts/process.py data.csv
+  scripts/process.py --format csv --output report.csv data.csv</pre>
+  </div>
+
+  <!-- 错误信息 -->
+  <h2>5. 错误信息要能自纠</h2>
+  <div class="card tight">
+    <p class="muted">agent 拿到错误后，<b>错误信息直接决定它的下一次尝试</b>。含糊的一句"invalid input"等于浪费一轮。</p>
+<pre><span class="c"># 差</span>
+Error: invalid input
+
+<span class="c"># 好 —— 说清：错在哪、期望什么、可选什么</span>
+Error: --format must be one of: json, csv, table.
+       Received: "xml"</pre>
+  </div>
+
+  <!-- 输出 -->
+  <h2>6. 结构化输出 + stdout/stderr 分流</h2>
+  <div class="card tight">
+    <div class="fline"><b>结构化</b><span>优先 JSON / CSV / TSV，而非自由文本——既能被 agent 消费，也能接 <code>jq</code> / <code>cut</code> / <code>awk</code> 组成管道。</span></div>
+    <div class="fline"><b>分流</b><span><b>数据走 stdout，进度/警告走 stderr</b>。这样 agent 能拿到干净可解析的结果，同时保留诊断信息。</span></div>
+<pre><span class="c"># 差 —— 空格对齐，难以程序化解析</span>
+NAME          STATUS    CREATED
+my-service    running   2025-01-15
+
+<span class="c"># 好 —— 字段边界明确</span>
+{"name": "my-service", "status": "running", "created": "2025-01-15"}</pre>
+  </div>
+
+  <!-- 其他考量 -->
+  <h2>7. 其他设计考量</h2>
+  <div class="card tight">
+    <div class="fline"><b>幂等</b><span>agent 可能重试。"不存在才创建" 比 "创建失败于重复" 更安全。</span></div>
+    <div class="fline"><b>输入约束</b><span>含糊输入直接报错，别猜。尽量用枚举 / 闭集。</span></div>
+    <div class="fline"><b>dry-run</b><span>破坏性 / 有状态操作提供 <code>--dry-run</code>，让 agent 先预览。</span></div>
+    <div class="fline"><b>退出码</b><span>不同失败类型用不同退出码，并在 <code>--help</code> 里说明含义。</span></div>
+    <div class="fline"><b>安全默认</b><span>破坏性操作要求显式确认 flag（<code>--confirm</code> / <code>--force</code>）。</span></div>
+    <div class="fline"><b>控制体积</b><span>工具输出常被截断（约 10–30K 字符）。大输出默认给摘要 / 限额，并提供 <code>--offset</code> 或要求 <code>--output</code>。</span></div>
+  </div>
+
+  <!-- 完整示例 -->
+  <h2>8. 完整脚本骨架</h2>
+  <div class="card tight">
+<pre>#!/usr/bin/env -S uv run
+# /// script
+# dependencies = ["pandas"]
+# ///
+"""从原始数据生成财务报告。一句话说明脚本做什么。"""
+import argparse, sys, json
+
+def main():
+    p = argparse.ArgumentParser(description="生成财务报告")
+    p.add_argument("input", help="输入数据文件")
+    p.add_argument("--format", choices=["json", "csv"], default="json",
+                   help="输出格式（默认 json）")
+    p.add_argument("--output", help="写入文件而非 stdout")
+    p.add_argument("--dry-run", action="store_true", help="仅预览，不写文件")
+    args = p.parse_args()
+
+    <span class="c"># ... 处理逻辑 ...</span>
+
+    <span class="c"># 数据 → stdout；进度/诊断 → stderr</span>
+    print(json.dumps(result, ensure_ascii=False))
+
+if __name__ == "__main__":
+    main()</pre>
+  </div>
+
+  <!-- 引用 -->
+  <h2>9. 在 SKILL.md 中如何引用</h2>
+  <div class="card tight">
+    <p class="muted">先列出可用脚本，再在流程里指示运行方式；路径相对<b>技能根目录</b>（agent 从那里执行命令）。</p>
+<pre>## 可用脚本
+- **`scripts/validate.sh`** — 校验配置文件
+- **`scripts/process.py`** — 处理输入数据
+
+## 工作流
+1. 运行校验：
+   ```bash
+   bash scripts/validate.sh "$INPUT_FILE"
+   ```
+2. 处理结果：
+   ```bash
+   python3 scripts/process.py --input results.json
+   ```</pre>
+    <div class="callout"><b>同一套相对路径约定</b>也适用于 <code>references/*.md</code> 里的代码块——命令路径一律相对技能根目录。</div>
+  </div>
+
+  <footer>
+    <span><a href="references.html">← references/ 撰写指南</a></span>
+    <span>下一步：<a href="assets.html">assets/ 撰写指南 →</a></span>
+  </footer>
+
+</div>
+</body>
+</html>

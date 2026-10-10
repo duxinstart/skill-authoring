@@ -1,0 +1,64 @@
+{
+  "spec": "agent-skills",
+  "note": "Field catalog for SKILL.md frontmatter. 'requirement' is hard (violations fail validation) or advisory (best practice).",
+  "fields": [
+    {
+      "name": "name",
+      "required": true,
+      "requirement": "hard",
+      "max_length": 64,
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "rules": [
+        "lowercase letters, digits, and single hyphens only",
+        "must not start or end with a hyphen",
+        "must not contain consecutive hyphens",
+        "must equal the parent directory name"
+      ],
+      "example": "pdf-processing"
+    },
+    {
+      "name": "description",
+      "required": true,
+      "requirement": "hard",
+      "max_length": 1024,
+      "rules": [
+        "must be non-empty",
+        "should state both what the skill does and when to use it",
+        "should include searchable keywords"
+      ],
+      "example": "Extract PDF text, fill forms, merge files. Use when handling PDFs."
+    },
+    {
+      "name": "license",
+      "required": false,
+      "requirement": "hard",
+      "rules": ["keep it short: a license name or a bundled file reference"],
+      "example": "Apache-2.0"
+    },
+    {
+      "name": "compatibility",
+      "required": false,
+      "requirement": "hard",
+      "max_length": 500,
+      "rules": ["only include when the skill has specific environment requirements"],
+      "example": "Requires Python 3.12+ and uv"
+    },
+    {
+      "name": "metadata",
+      "required": false,
+      "requirement": "hard",
+      "rules": ["map of string keys to string values", "use reasonably unique key names"],
+      "example": "author: example-org"
+    },
+    {
+      "name": "allowed-tools",
+      "required": false,
+      "requirement": "experimental",
+      "rules": [
+        "space-separated list of pre-approved tools",
+        "support varies across client implementations"
+      ],
+      "example": "Bash(git:*) Bash(jq:*) Read"
+    }
+  ]
+}
