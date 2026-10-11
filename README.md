@@ -1,8 +1,8 @@
 # Agent Skill 目录结构规范
 
-> 一份面向中文读者的 **Agent Skill** 撰写规范站点，外加一个可直接使用的技能包 [`skill-authoring`](skill-authoring/)。
+> 一份面向中文读者的 **Agent Skill** 撰写规范站点。
 >
-> A Chinese-language specification site for authoring Agent Skills, bundled with a ready-to-use `skill-authoring` skill.
+> A Chinese-language specification site for authoring Agent Skills.
 
 Agent Skill 是用于扩展 AI agent 能力的轻量开放格式：把「程序性知识」与「团队 / 项目专有上下文」打包成可移植、可版本化的文件夹，agent 按需加载。
 
@@ -10,14 +10,13 @@ Agent Skill 是用于扩展 AI agent 能力的轻量开放格式：把「程序�
 
 ---
 
-## 项目包含两部分
+## 项目包含
 
 | 部分 | 形态 | 用途 |
 |---|---|---|
 | **规范站点** | 10 个静态 HTML 页面 + 1 个 CSS | 给人阅读的撰写指南，从目录结构讲到每个子目录的写法 |
-| **技能包** | [`skill-authoring/`](skill-authoring/) | 给 agent 用的技能：新建 / 校验 / 优化 Skill，可安装到任意支持 Skill 的 agent |
 
-站点里的 [`examples.html`](examples.html) 正是以 `skill-authoring` 为**贯穿示例**——它按五个阶段从最小版生长为完整版，所以这两部分是同一份内容的两种形态。
+> **示例与技能包待重建。** 原示例技能 `skill-authoring` 的内容已移除——它由单方面完成，**未经「示例要求说明书」定义与验收**，不具备作为示例的资格。目录位置已保留（[`skill-authoring/`](skill-authoring/)），待要求确定后重建。
 
 ---
 
@@ -34,15 +33,12 @@ Agent Skill 是用于扩展 AI agent 能力的轻量开放格式：把「程序�
 ├── scripts.html                # scripts/ 撰写指南
 ├── assets.html                 # assets/ 撰写指南
 ├── evals.html                  # evals/ 撰写指南
-├── examples.html               # 完整示例（贯穿 skill-authoring）
+├── examples.html               # 完整示例（待重建）
 ├── skill-spec.css              # 全站共用样式
+├── 文档定位说明.md             # 全站撰写准绳
 │
-└── skill-authoring/            # 可直接使用的技能包
-    ├── SKILL.md                # 入口 + 资源路由表
-    ├── references/             # 格式细则、描述写法、报错对照
-    ├── scripts/                # scaffold / validate / lint_description
-    ├── assets/                 # 模板、schema、字段速查表
-    └── evals/                  # 评测用例与测试素材
+└── skill-authoring/            # 示例技能位置（内容待重建）
+    └── README.md               # 说明：为何移除、重建前提
 ```
 
 ---
@@ -60,7 +56,7 @@ Agent Skill 是用于扩展 AI agent 能力的轻量开放格式：把「程序�
 | [`assets.html`](assets.html) | `assets/` 撰写指南 | templates / schemas / data 三类静态资源 |
 | [`evals.html`](evals.html) | `evals/` 撰写指南 | 用例设计、断言写法、运行与判分迭代 |
 | [`design.html`](design.html) | 目录取舍与设计流程 | 六步演进路径、三个判断问题、常见反模式 |
-| [`examples.html`](examples.html) | **完整示例** | `skill-authoring` 的五个阶段演进与最终总览 |
+| [`examples.html`](examples.html) | **完整示例** | 待重建（原示例已移除） |
 
 > 页面之间通过相对路径互相链接，请在**同一目录**下整体浏览，勿单独移动单个 HTML 文件。
 
@@ -68,52 +64,15 @@ Agent Skill 是用于扩展 AI agent 能力的轻量开放格式：把「程序�
 
 ---
 
-## skill-authoring 技能包
+## skill-authoring（待重建）
 
-一个用来**新建 / 校验 / 优化 Agent Skill** 的技能。
+一个用来**新建 / 校验 / 优化 Agent Skill** 的技能——**内容已移除，待重建**。
 
-**它做什么**
+**为什么移除**：原示例由单方面完成，没有经过「示例要求说明书」的定义，也没有经过验收，不具备作为示例的资格。
 
-- **新建** — `scripts/scaffold.py` 生成合规的技能骨架
-- **校验** — `scripts/validate.py` 对照格式规范检查（优先调用 `skills-ref`）
-- **优化描述** — `scripts/lint_description.py` 检查 `description` 的触发质量
+**当前状态**：目录位置保留，内含一份 [`README.md`](skill-authoring/README.md) 说明移除原因与重建前提。完整内容在 git 历史中（提交 `32bdef6` 及更早），可恢复。
 
-**目录**
-
-```
-skill-authoring/
-├── SKILL.md                     # 入口 + 资源路由表
-├── references/
-│   ├── REFERENCE.md             # 格式规范细则
-│   ├── description-guide.md     # 描述写法与触发优化
-│   └── validation-errors.md     # 条件触发：校验失败时读
-├── scripts/
-│   ├── scaffold.py              # 生成技能骨架
-│   ├── validate.py              # 校验技能（包装 skills-ref）
-│   └── lint_description.py      # 检查描述质量
-├── assets/
-│   ├── templates/SKILL.md.template
-│   ├── schemas/frontmatter.schema.json
-│   └── data/field-catalog.json
-└── evals/
-    ├── evals.json               # 3 条评测用例
-    └── files/                   # 测试素材（含一个故意写坏的样例）
-```
-
-**快速使用**
-
-```bash
-cd skill-authoring
-
-# 1) 生成一个技能骨架
-python3 scripts/scaffold.py pdf-processing --out ./skills
-
-# 2) 校验是否符合格式规范
-python3 scripts/validate.py ./skills/pdf-processing
-
-# 3) 检查 description 的触发质量
-python3 scripts/lint_description.py ./skills/pdf-processing
-```
+**重建前提**：先完成《示例要求说明书》——定义它要证明什么、必须覆盖哪些目录与页面原则、验收标准、形态与主题。
 
 ---
 
