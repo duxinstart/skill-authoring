@@ -31,6 +31,7 @@
   <div class="crumb"><a href="index.html">首页</a> / assets/ 撰写指南</div>
   <h1>assets/ 撰写指南</h1>
   <p class="sub">纯静态资源，不含任何逻辑。作用是给 agent 提供「具体的结构可参照」——模型对具体结构 pattern-match 得比散文描述好得多。</p>
+  <p class="muted" style="margin-top:10px">本页内容均为<b>建议</b>。</p>
 
   <!-- 三类 -->
   <h2>1. 三类静态资源</h2>
@@ -43,8 +44,32 @@
     </table>
   </div>
 
+  <!-- 操作流程 -->
+  <h2>2. 从零到成稿：四步流程</h2>
+  <p class="h2sub">需要静态资源时，按这个顺序做。</p>
+  <div class="card">
+    <div class="steps">
+      <div class="step">
+        <h4>判断类型</h4>
+        <p>要固定输出结构 → <b>模板</b>；要定义数据结构 → <b>schema</b>；要做静态映射 → <b>查找表</b>。</p>
+      </div>
+      <div class="step">
+        <h4>先决定内联还是外置</h4>
+        <p><b>小且固定</b>的（三五个条目、短模板）直接写进 <code>SKILL.md</code>；<b>长、会变、或只在特定情况用</b>的才外置。</p>
+      </div>
+      <div class="step">
+        <h4>落盘</h4>
+        <p>放对应的子目录：<code>templates/</code>、<code>schemas/</code>、<code>data/</code>。保持<b>一层</b>，文件名自解释。</p>
+      </div>
+      <div class="step">
+        <h4>在 SKILL.md 里接上路由</h4>
+        <p>写明「<b>什么情况用哪个资源</b>」。没写触发条件的资源，等于不存在。</p>
+      </div>
+    </div>
+  </div>
+
   <!-- templates -->
-  <h2>2. templates/ —— 输出模板</h2>
+  <h2>3. templates/ —— 输出模板</h2>
   <div class="card tight">
     <div class="fline"><b>作用</b><span>要固定输出格式时给模板，比用散文描述可靠——模型照着具体结构填，不易跑偏。</span></div>
     <div class="fline"><b>何时读</b><span>需要按模板输出时。由 SKILL.md 路由表指明。</span></div>
@@ -70,7 +95,7 @@
   </div>
 
   <!-- schemas -->
-  <h2>3. schemas/ —— 数据结构定义</h2>
+  <h2>4. schemas/ —— 数据结构定义</h2>
   <div class="card tight">
     <div class="fline"><b>作用</b><span>定义输入/输出的结构，供<b>脚本校验</b>、也供 agent 理解每个字段的类型与约束。</span></div>
     <div class="fline"><b>何时读</b><span>需要构造或解析结构化数据、或校验其合法性时。</span></div>
@@ -90,7 +115,7 @@
   </div>
 
   <!-- data -->
-  <h2>4. data/ —— 静态查找表</h2>
+  <h2>5. data/ —— 静态查找表</h2>
   <div class="card tight">
     <div class="fline"><b>作用</b><span>存放静态映射数据，避免把大表<b>硬编码</b>进 SKILL.md 或脚本——既省上下文，又便于单独维护。</span></div>
     <div class="fline"><b>何时读</b><span>需要做映射 / 查表时（路由表写"需要币种换算时读 assets/data/currencies.json"）。</span></div>
@@ -104,7 +129,7 @@
   </div>
 
   <!-- 组织 -->
-  <h2>5. 组织与命名</h2>
+  <h2>6. 组织与命名</h2>
   <div class="card tight">
     <div class="fline"><b>命名</b><span>小写、kebab-case；模板带明确后缀（<code>report.md</code>、<code>email.md</code>），schema 用 <code>*.schema.json</code>。</span></div>
     <div class="fline"><b>路径</b><span>相对技能根目录，如 <code>assets/templates/report.md</code>。</span></div>
@@ -112,15 +137,53 @@
     <div class="fline"><b>触发</b><span>每个资源都要在路由表里写明"何时用"。</span></div>
   </div>
 
-  <!-- 反模式 -->
-  <h2>6. 反模式</h2>
+  <!-- 常见错误 -->
+  <h2>7. 常见错误速查</h2>
   <div class="card tight">
-    <ul class="tick">
-      <li><b>把很小的固定表也塞进 assets/</b> → 三五个条目直接内联即可，别为它加一次文件加载。</li>
-      <li><b>模板里混入业务逻辑</b> → assets 只放静态结构，逻辑归 scripts。</li>
-      <li><b>资源没有触发条件</b> → 永不被加载。</li>
-      <li><b>图片/数据文件无说明</b> → 至少让文件名自解释，或在路由表里说明用途。</li>
+    <table>
+      <tr><th style="width:42%">错误</th><th>后果 / 纠正</th></tr>
+      <tr><td>把很小的固定表也塞进 <code>assets/</code></td><td>白加一次文件加载 → 三五个条目直接内联</td></tr>
+      <tr><td>模板里混入业务逻辑</td><td>assets 只放静态结构，逻辑归 <code>scripts/</code></td></tr>
+      <tr><td>资源没有触发条件</td><td>永不被加载 → 在路由里写明何时用</td></tr>
+      <tr><td>文件 / 数据无说明</td><td>至少让文件名自解释，或在路由表里说明用途</td></tr>
+      <tr><td>子目录继续往下嵌套</td><td>保持<b>一层</b>（templates / schemas / data）</td></tr>
+    </table>
+  </div>
+
+  <!-- 自检 -->
+  <h2>8. 交付前自检清单</h2>
+  <div class="card tight">
+    <ul class="checklist">
+      <li><b>短模板、小查找表已内联</b>在正文——没有为了它多一次文件加载</li>
+      <li>每个资源都在路由表里写了<b>何时用</b></li>
+      <li>目录保持<b>一层</b>（templates / schemas / data），没有继续嵌套</li>
+      <li>模板里<b>没有混入业务逻辑</b>（逻辑归 <code>scripts/</code>）</li>
+      <li>文件名自解释（<code>report.md</code>、<code>*.schema.json</code>），引用用相对路径</li>
+      <li>与 <code>SKILL.md</code> <b>没有内容重复</b></li>
     </ul>
+  </div>
+
+  <!-- 延伸阅读 -->
+  <h2>9. 延伸阅读</h2>
+  <div class="cards">
+    <a class="navcard" href="scripts.html">
+      <span class="tag">关联</span>
+      <h3>scripts/ 撰写指南</h3>
+      <p>assets 放"静态结构"，scripts 放"逻辑"——边界在这里。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="references.html">
+      <span class="tag">关联</span>
+      <h3>references/ 撰写指南</h3>
+      <p>两者都是按需加载，但用途不同：一个给人/agent 读，一个用于产出。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="design.html">
+      <span class="tag">关联</span>
+      <h3>目录取舍与设计流程</h3>
+      <p>什么时候才该建这个目录。</p>
+      <span class="go">查看 →</span>
+    </a>
   </div>
 
   <footer>

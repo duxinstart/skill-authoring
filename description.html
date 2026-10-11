@@ -33,8 +33,8 @@
   <p class="sub"><code>description</code> 是 agent 决定「要不要加载这个技能」的<b>唯一依据</b>。写得窄，该触发时不触发；写得宽，不该触发时乱触发。本页讲清怎么写、以及如何系统性地把触发率调上去。</p>
 
   <div class="legend-mk" style="margin-top:14px">
-    <span><i class="mk hard">硬性</i>违反会被官方校验器拒绝</span>
-    <span><i class="mk advice">建议</i>官方最佳实践</span>
+    <span><i class="mk hard">硬性</i>运行时强制，违反会导致技能无法被加载</span>
+    <span><i class="mk advice">建议</i>我们给出的推荐，不做不报错但效果差</span>
   </div>
 
   <!-- 1. 触发机制 -->
@@ -195,6 +195,44 @@ description: >
       <li>长度 ≤ <b>1024</b> 字符，且不至于短到缺乏上下文</li>
       <li>用真实查询跑过，确认<b>该触发的会触发、不该触发的不会</b></li>
     </ul>
+  </div>
+
+  <!-- 常见错误 -->
+  <h2>7. 常见错误速查</h2>
+  <div class="card tight">
+    <table>
+      <tr><th style="width:42%">错误</th><th>后果 / 纠正</th></tr>
+      <tr><td>只写"做什么"，不写"何时用"</td><td>很可能不被触发 → 补上适用场景</td></tr>
+      <tr><td>罗列实现细节（"调用 pdfplumber 解析…"）</td><td>用户不会这么说 → 改写成<b>用户意图</b></td></tr>
+      <tr><td>太笼统（"帮助处理 PDF"）</td><td>无法匹配具体任务 → 写清具体能力</td></tr>
+      <tr><td>写得过长</td><td>撑上下文 → 精简；硬上限 1024 字符</td></tr>
+      <tr><td>拿全部查询反复调</td><td>过拟合 → 留验证集，按验证集选版本</td></tr>
+      <tr><td>把失败查询里的词照抄进去</td><td>过拟合 → 提炼它代表的<b>一般类别</b></td></tr>
+      <tr><td>把"不做什么"全列上</td><td>描述臃肿 → 只在能防住<b>近似误触发</b>时才加排除</td></tr>
+    </table>
+  </div>
+
+  <!-- 延伸阅读 -->
+  <h2>8. 延伸阅读</h2>
+  <div class="cards">
+    <a class="navcard" href="skill-md.html">
+      <span class="tag">关联</span>
+      <h3>SKILL.md 撰写指南</h3>
+      <p><code>description</code> 是 frontmatter 的必需字段之一，写法与约束在那里。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="examples.html">
+      <span class="tag">实战</span>
+      <h3>完整示例</h3>
+      <p>看一个真实技能的描述是怎么写的、为什么那么写。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="evals.html">
+      <span class="tag">关联</span>
+      <h3>evals/ 撰写指南</h3>
+      <p>描述调好后，用评测锁定整体质量不回退。</p>
+      <span class="go">查看 →</span>
+    </a>
   </div>
 
   <footer>

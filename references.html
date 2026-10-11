@@ -31,6 +31,7 @@
   <div class="crumb"><a href="index.html">首页</a> / references/ 撰写指南</div>
   <h1>references/ 撰写指南</h1>
   <p class="sub">技能的按需知识库。核心思想：<b>把「偶尔才用」的长内容从 SKILL.md 搬出来</b>，用路由表指明何时加载。</p>
+  <p class="muted" style="margin-top:10px">本页内容均为<b>建议</b>：不做不会报错，但会明显影响效果与上下文开销。</p>
 
   <!-- 定位 -->
   <h2>1. 定位：什么时候才需要它</h2>
@@ -44,8 +45,36 @@
     <div class="callout"><b>组织原则：</b>每个文件都应「<b>独立、聚焦、可单独读懂</b>」——因为它们是被<b>整篇</b>按需加载的，越精准越省上下文。</div>
   </div>
 
+  <!-- 操作流程 -->
+  <h2>2. 从零到成稿：五步流程</h2>
+  <p class="h2sub">决定要建 <code>references/</code> 之后，按这个顺序做。</p>
+  <div class="card">
+    <div class="steps">
+      <div class="step">
+        <h4>判断是否需要</h4>
+        <p>只有当 <code>SKILL.md</code> 开始装不下"偶尔才用"的细节时才建。<b>装得下就别建</b>——多一个文件就多一次加载。</p>
+      </div>
+      <div class="step">
+        <h4>按主题拆分</h4>
+        <p>一个文件一个主题。拆分依据通常是：<b>领域</b>（finance / legal）、<b>条件</b>（出错时才看）、<b>格式</b>（表单字段）。</p>
+      </div>
+      <div class="step">
+        <h4>命名并落盘</h4>
+        <p>小写 kebab-case；优先用约定名：<code>REFERENCE.md</code>（主参考）、<code>&lt;domain&gt;.md</code>（领域）、<code>FORMS.md</code>（表单）。</p>
+      </div>
+      <div class="step">
+        <h4>写内容</h4>
+        <p>每份都要<b>独立可读</b>、只讲一个主题。别写"如何入门"——那是 <code>SKILL.md</code> 的事。</p>
+      </div>
+      <div class="step">
+        <h4>在 SKILL.md 里接上路由</h4>
+        <p>逐个写明「<b>什么情况读它</b>」。没写触发条件的参考文件，等于不存在。</p>
+      </div>
+    </div>
+  </div>
+
   <!-- 通用规范 -->
-  <h2>2. 通用规范</h2>
+  <h2>3. 通用规范</h2>
   <div class="card tight">
     <div class="fline"><b>一层深度</b><span>所有引用只从 <code>SKILL.md</code> 出发<b>一层</b>可达；禁止 <code>references/a/b/c.md</code> 这类深链，也不要嵌套引用链。</span></div>
     <div class="fline"><b>命名</b><span>统一小写、kebab-case；约定名优先：<code>REFERENCE.md</code>（主参考）、<code>&lt;domain&gt;.md</code>（领域）、<code>FORMS.md</code>（表单）。</span></div>
@@ -55,7 +84,7 @@
   </div>
 
   <!-- REFERENCE.md -->
-  <h2>3. REFERENCE.md —— 主技术参考</h2>
+  <h2>4. REFERENCE.md —— 主技术参考</h2>
   <div class="card tight">
     <div class="fline"><b>作用</b><span>技能最完整的技术说明，是 SKILL.md「简版」的<b>详版兜底</b>。</span></div>
     <div class="fline"><b>何时读</b><span>任务需要精确细节、SKILL.md 的简版不够用时。</span></div>
@@ -72,7 +101,7 @@
   </div>
 
   <!-- domain.md -->
-  <h2>4. &lt;domain&gt;.md —— 领域知识</h2>
+  <h2>5. &lt;domain&gt;.md —— 领域知识</h2>
   <div class="card tight">
     <div class="fline"><b>作用</b><span>封装<b>某一垂直领域</b>的专有知识；一个领域一个文件。</span></div>
     <div class="fline"><b>何时读</b><span>任务明确落在该领域时（"做财报分析" → <code>finance.md</code>）。</span></div>
@@ -96,7 +125,7 @@
   </div>
 
   <!-- topic -->
-  <h2>5. 条件触发文档（如 api-errors.md）</h2>
+  <h2>6. 条件触发文档（如 api-errors.md）</h2>
   <div class="card tight">
     <div class="fline"><b>作用</b><span>把「<b>只在特定条件下才需要</b>」的知识单独成文——平时完全不加载，出问题才读。</span></div>
     <div class="fline"><b>何时读</b><span>由路由表写明条件，如「当 API 返回非 200 时读取」。</span></div>
@@ -115,9 +144,9 @@
   </div>
 
   <!-- FORMS -->
-  <h2>6. FORMS.md —— 表单 / 结构化格式</h2>
+  <h2>7. FORMS.md —— 表单 / 结构化格式</h2>
   <div class="card tight">
-    <div class="fline"><b>作用</b><span>规范点名的约定文件名，用于描述表单模板或结构化数据格式。</span></div>
+    <div class="fline"><b>作用</b><span>描述表单模板或结构化数据格式——字段清单、填写规则、校验规则。</span></div>
     <div class="fline"><b>何时读</b><span>需要填写、解析或校验表单 / 结构化数据时。</span></div>
 <pre>## 字段清单
 | 字段名        | 类型   | 必填 | 说明            |
@@ -130,16 +159,54 @@
 ## 校验规则</pre>
   </div>
 
-  <!-- 反模式 -->
-  <h2>7. 反模式</h2>
+  <!-- 常见错误 -->
+  <h2>8. 常见错误速查</h2>
   <div class="card tight">
-    <ul class="tick">
-      <li><b>只写"详见 references/"</b> → 必须写触发条件，否则文件永不被读。</li>
-      <li><b>深层嵌套</b>（<code>a/b/c.md</code>）→ 只保留一层。</li>
-      <li><b>一个文件塞多个不相关主题</b> → 拆开，各自聚焦。</li>
-      <li><b>把 SKILL.md 该有的"主干流程"也搬进来</b> → 参考文件只放细节，主干留在 SKILL.md。</li>
-      <li><b>与 SKILL.md 内容重复</b> → 重复既浪费上下文又易不同步。</li>
+    <table>
+      <tr><th style="width:42%">错误</th><th>后果 / 纠正</th></tr>
+      <tr><td>只写"详见 <code>references/</code>"</td><td>文件永不被读 → 必须写<b>触发条件</b></td></tr>
+      <tr><td>深层嵌套（<code>a/b/c.md</code>）</td><td>只保留<b>一层</b></td></tr>
+      <tr><td>一个文件塞多个不相关主题</td><td>拆开，各自聚焦</td></tr>
+      <tr><td>把主干流程也搬进来</td><td>参考文件只放细节，主干留在 <code>SKILL.md</code></td></tr>
+      <tr><td>与 <code>SKILL.md</code> 内容重复</td><td>既浪费上下文又易不同步 → 删掉重复</td></tr>
+      <tr><td>文件越长越好、什么都写</td><td>按需加载是<b>整篇</b>读入 → 拆成多份，各自聚焦</td></tr>
+    </table>
+  </div>
+
+  <!-- 自检 -->
+  <h2>9. 交付前自检清单</h2>
+  <div class="card tight">
+    <ul class="checklist">
+      <li>每个参考文件都在 <code>SKILL.md</code> 里写了<b>触发条件</b>（"什么情况读它"）</li>
+      <li>引用只<b>一层深</b>，没有 <code>a/b/c.md</code> 这类深链，也没有嵌套引用链</li>
+      <li>每个文件<b>独立可读</b>，只讲一个主题</li>
+      <li>主干流程留在 <code>SKILL.md</code>，没有搬进 <code>references/</code></li>
+      <li>与 <code>SKILL.md</code> <b>没有内容重复</b></li>
+      <li>文件名小写、kebab-case；引用一律用相对路径</li>
     </ul>
+  </div>
+
+  <!-- 延伸阅读 -->
+  <h2>10. 延伸阅读</h2>
+  <div class="cards">
+    <a class="navcard" href="skill-md.html">
+      <span class="tag">关联</span>
+      <h3>SKILL.md 撰写指南</h3>
+      <p>路由表就写在正文里——参考文件能否被读到，取决于它。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="structure-detail.html">
+      <span class="tag">关联</span>
+      <h3>目录结构详解</h3>
+      <p><code>references/</code> 在整体结构中的位置与边界。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="design.html">
+      <span class="tag">关联</span>
+      <h3>目录取舍与设计流程</h3>
+      <p>什么时候才该建这个目录——以及什么时候不该。</p>
+      <span class="go">查看 →</span>
+    </a>
   </div>
 
   <footer>

@@ -31,6 +31,7 @@
   <div class="crumb"><a href="index.html">首页</a> / 目录取舍与设计流程</div>
   <h1>目录取舍与设计流程</h1>
   <p class="sub">除了 <code>SKILL.md</code>，其余全部可选。<b>按需增加，不要预先堆。</b>目录不是"设计出来"的，是"长出来的"。</p>
+  <p class="muted" style="margin-top:10px">本页内容均为<b>建议</b>。</p>
 
   <!-- 决策表 -->
   <h2>1. 什么时候需要哪个目录</h2>
@@ -42,7 +43,8 @@
       <tr><td><code>scripts/</code></td><td><span class="badge opt">可选</span></td><td>当存在<b>确定性、可重复、agent 每次都要重新实现</b>的操作时（解析格式、生成图表、校验产物）。</td></tr>
       <tr><td><code>assets/</code></td><td><span class="badge opt">可选</span></td><td>当需要<b>固定的输出模板</b>、<b>数据结构定义</b>，或<b>静态查找表</b>时。</td></tr>
       <tr><td><code>evals/</code></td><td><span class="badge opt">可选</span></td><td>当技能需要<b>长期维护、验证质量</b>，或要与"没有技能时"对比效果时。</td></tr>
-      <tr><td><code>README.md</code><br><code>LICENSE</code><br><code>CHANGELOG.md</code></td><td><span class="badge hum">给人看</span></td><td>当技能要<b>对外发布 / 团队共享 / 版本化管理</b>时。它们<b>不进模型上下文</b>。</td></tr>
+      <tr><td><code>agents/</code></td><td><span class="badge opt">可选</span></td><td>需要配置<b>厂商特定信息</b>时（UI 元数据、依赖、调用策略）。<b>非标准</b>，不同客户端支持不一。</td></tr>
+      <tr><td><code>README / LICENSE / CHANGELOG</code></td><td><span class="badge hum">通常不必加</span></td><td>仅当有明确的<b>打包或分发要求</b>时才加。它们对 agent 的行为没有任何影响。</td></tr>
     </table>
     <div class="callout"><b>一句话原则：</b>当某类内容多到撑不住 <code>SKILL.md</code>，或某段逻辑反复被重写，就把它拆出去。</div>
   </div>
@@ -89,16 +91,54 @@
     </ul>
   </div>
 
-  <!-- 反模式 -->
-  <h2>4. 常见反模式</h2>
+  <!-- 常见错误 -->
+  <h2>4. 常见错误速查</h2>
   <div class="card tight">
-    <ul class="tick">
-      <li><b>一开始就铺满完整目录树</b> → 大部分目录会空着，纯属负担。</li>
-      <li><b>为"以后可能用到"而预留目录</b> → 用不到就是噪音。</li>
-      <li><b>SKILL.md 与 references/ 内容重复</b> → 浪费上下文，还容易不同步。</li>
-      <li><b>资源文件没有触发条件</b> → 永远不会被加载，等于不存在。</li>
-      <li><b>把主流程也拆进 references/</b> → 主干必须留在 SKILL.md，拆走的只能是细节。</li>
+    <table>
+      <tr><th style="width:42%">错误</th><th>后果 / 纠正</th></tr>
+      <tr><td>一开始就铺满完整目录树</td><td>大部分目录会空着，纯属负担 → 从最小可用起步</td></tr>
+      <tr><td>为"以后可能用到"预留目录</td><td>用不到就是噪音 → 等真的需要再建</td></tr>
+      <tr><td><code>SKILL.md</code> 与 <code>references/</code> 内容重复</td><td>浪费上下文、易不同步 → 删掉重复</td></tr>
+      <tr><td>资源文件没有触发条件</td><td>永远不会被加载，等于不存在 → 写明何时读</td></tr>
+      <tr><td>把主流程也拆进 <code>references/</code></td><td>主干必须留在 <code>SKILL.md</code>，拆走的只能是细节</td></tr>
+      <tr><td>把 <code>README</code> / <code>CHANGELOG</code> 当默认动作</td><td>对 agent 行为毫无影响 → 通常不必加</td></tr>
+    </table>
+  </div>
+
+  <!-- 自检 -->
+  <h2>5. 交付前自检清单</h2>
+  <div class="card tight">
+    <ul class="checklist">
+      <li>从<b>最小可用</b>起步——没有预先铺满目录树</li>
+      <li>每个已存在的目录都有<b>明确用途</b>，不是"以后可能用到"</li>
+      <li>删掉任一文件，agent 都会<b>做错</b>（否则它可能根本不需要存在）</li>
+      <li>拆出去的是<b>细节</b>，主干仍在 <code>SKILL.md</code></li>
+      <li>没有与 <code>SKILL.md</code> 重复的内容</li>
+      <li>每个资源文件都有<b>触发条件</b>（写明了何时读）</li>
     </ul>
+  </div>
+
+  <!-- 延伸阅读 -->
+  <h2>6. 延伸阅读</h2>
+  <div class="cards">
+    <a class="navcard" href="structure-detail.html">
+      <span class="tag">关联</span>
+      <h3>目录结构详解</h3>
+      <p>每个目录具体装什么、何时被读。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="examples.html">
+      <span class="tag">实战</span>
+      <h3>完整示例</h3>
+      <p>看这套演进路径在一个真实技能上是怎么走的。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="skill-md.html">
+      <span class="tag">关联</span>
+      <h3>SKILL.md 撰写指南</h3>
+      <p>主干怎么写进正文，决定了哪些内容该拆出去。</p>
+      <span class="go">查看 →</span>
+    </a>
   </div>
 
   <footer>

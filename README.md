@@ -75,7 +75,7 @@ Agent Skill 是用于扩展 AI agent 能力的轻量开放格式：把「程序�
 **它做什么**
 
 - **新建** — `scripts/scaffold.py` 生成合规的技能骨架
-- **校验** — `scripts/validate.py` 对照官方格式规范检查（优先调用官方 `skills-ref`）
+- **校验** — `scripts/validate.py` 对照格式规范检查（优先调用 `skills-ref`）
 - **优化描述** — `scripts/lint_description.py` 检查 `description` 的触发质量
 
 **目录**
@@ -142,9 +142,9 @@ python3 -m http.server 8000
 | 依赖 | 版本 | 说明 |
 |---|---|---|
 | Python | 3.10+ | 运行 `skill-authoring/scripts/` 下的脚本 |
-| [`skills-ref`](https://github.com/agentskills/agentskills/tree/main/skills-ref) | 可选 | 官方校验库。安装后 `validate.py` 会优先调用它；未安装时自动退化为内置的**格式检查**，输出中的 `engine` 字段会标明用的是哪套 |
+| [`skills-ref`](https://github.com/agentskills/agentskills/tree/main/skills-ref) | 可选 | 校验库。安装后 `validate.py` 会优先调用它；未安装时自动退化为内置的**格式检查**，输出中的 `engine` 字段会标明用的是哪套 |
 
-安装官方校验库（可选）：
+安装校验库（可选）：
 
 ```bash
 # 需先取得 agentskills 仓库（见下方「与上游的关系」）
@@ -156,21 +156,21 @@ python3 -m venv .venv && source .venv/bin/activate && pip install -e .
 
 ## 内容口径（阅读时请注意）
 
-文档对每一条规则都区分了**来源**，不要把它们当成同一等级的约束：
+文档对每一条规则都区分了**性质**，不要把它们当成同一等级的约束：
 
 | 标记 | 含义 |
 |---|---|
-| **硬性要求** | 来自官方格式规范，违反即校验失败 |
-| **建议** | 官方推荐做法，不是强制 |
-| **实践经验** | 本项目的归纳，供参考，可依场景取舍 |
+| **硬性** | 运行时强制，违反会导致技能无法被加载 |
+| **建议** | 我们给出的推荐，不做不会报错，但效果会差 |
+| **实验性** | 客户端支持不一，谨慎使用 |
 
-典型例子：**硬性要求**只覆盖 frontmatter 字段、命名与必需文件（见官方 specification）——违反会被校验器拒绝。而「调度信息必须完整清晰、冗余必须剔除」属于**实践经验**层面的原则，不进校验器，违反了也不会报错。
+典型例子：**硬性**只覆盖 frontmatter 字段、命名与必需文件——违反会被校验器拒绝。而「调度信息必须完整清晰、冗余必须剔除」属于**建议**层面的原则，不进校验器，违反了也不会报错。
 
 ---
 
 ## 与上游的关系
 
-本项目的格式规范以 **[agentskills/agentskills](https://github.com/agentskills/agentskills)** 为准，`skill-authoring` 的校验也优先复用其官方库 `skills-ref`。
+本项目的格式规范与 **[agentskills/agentskills](https://github.com/agentskills/agentskills)** 保持一致，`skill-authoring` 的校验也优先复用其参考库 `skills-ref`。
 
 上游仓库**不包含在本仓库中**（已在 [`.gitignore`](.gitignore) 中排除）。如需完整校验能力，请单独克隆：
 

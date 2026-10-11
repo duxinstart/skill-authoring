@@ -31,6 +31,7 @@
   <div class="crumb"><a href="index.html">首页</a> / scripts/ 撰写指南</div>
   <h1>scripts/ 撰写指南</h1>
   <p class="sub">把确定性、可重复的操作固化成脚本。脚本比让模型每次现写更可靠、更省 token，也更易测试。</p>
+  <p class="muted" style="margin-top:10px">本页内容除标注 <i class="mk hard">硬性</i> 的一节外，均为<b>建议</b>。</p>
 
   <!-- 何时写 -->
   <h2>1. 什么时候该写脚本</h2>
@@ -43,8 +44,40 @@
     <div class="callout"><b>反例：</b>只是调用一个带几个 flag 的现成工具（如 <code>npx eslint@9 --fix .</code>）——直接写在 SKILL.md 里即可，不必建脚本。</div>
   </div>
 
+  <!-- 操作流程 -->
+  <h2>2. 从零到成稿：六步流程</h2>
+  <p class="h2sub">决定要写脚本之后，按这个顺序做。</p>
+  <div class="card">
+    <div class="steps">
+      <div class="step">
+        <h4>确认该写脚本</h4>
+        <p>标准只有一条：<b>这段逻辑 agent 每次都在重写</b>。只是调一个现成工具，就别写脚本。</p>
+      </div>
+      <div class="step">
+        <h4>定接口</h4>
+        <p>先想清楚三件事：<b>输入怎么给</b>（flag / 环境变量 / stdin）、<b>输出给什么</b>（结构化数据）、<b>失败怎么报</b>（退出码 + 错误信息）。</p>
+      </div>
+      <div class="step">
+        <h4>写实现</h4>
+        <p>依赖<b>内联声明并固定版本</b>，让一条命令就能跑；不引交互式输入。</p>
+      </div>
+      <div class="step">
+        <h4>补 --help 与错误信息</h4>
+        <p><code>--help</code> 写清描述、全部 flag 与用法示例；错误信息要能让 agent <b>自己改对</b>。</p>
+      </div>
+      <div class="step">
+        <h4>本地跑通</h4>
+        <p>新写或改过的脚本<b>必须实际运行一次</b>——包括失败路径（缺参、错格式）。</p>
+      </div>
+      <div class="step">
+        <h4>在 SKILL.md 里接上</h4>
+        <p>列出脚本清单，并在流程的对应步骤里写明<b>什么时候跑它</b>。路径相对技能根目录。</p>
+      </div>
+    </div>
+  </div>
+
   <!-- 自包含 -->
-  <h2>2. 自包含：让一条命令就能跑</h2>
+  <h2>3. 自包含：让一条命令就能跑</h2>
   <p class="h2sub">脚本应<b>自带依赖声明</b>，agent 无需额外的 manifest 或安装步骤。</p>
   <div class="card tight">
     <table>
@@ -59,7 +92,7 @@
   </div>
 
   <!-- 非交互 -->
-  <h2>3. 禁止交互式提示（硬要求）</h2>
+  <h2>4. 禁止交互式提示 <i class="mk hard">硬性</i></h2>
   <div class="card tight">
     <p class="muted">agent 在<b>非交互 shell</b> 中运行——无法响应 TTY 提示、密码框、确认菜单。任何阻塞式等待都会<b>永久挂起</b>。所有输入必须通过命令行 flag、环境变量或 stdin 提供。</p>
 <pre><span class="c"># 差 —— 挂起等待输入</span>
@@ -73,7 +106,7 @@ Usage: python scripts/deploy.py --env staging --tag v1.2.3</pre>
   </div>
 
   <!-- --help -->
-  <h2>4. 用 --help 交代接口</h2>
+  <h2>5. 用 --help 交代接口</h2>
   <div class="card tight">
     <p class="muted"><code>--help</code> 是 agent 了解脚本接口的<b>主要途径</b>。要简短（它会进入上下文），但包含描述、全部 flag 与用法示例。</p>
 <pre>Usage: scripts/process.py [OPTIONS] INPUT_FILE
@@ -91,7 +124,7 @@ Examples:
   </div>
 
   <!-- 错误信息 -->
-  <h2>5. 错误信息要能自纠</h2>
+  <h2>6. 错误信息要能自纠</h2>
   <div class="card tight">
     <p class="muted">agent 拿到错误后，<b>错误信息直接决定它的下一次尝试</b>。含糊的一句"invalid input"等于浪费一轮。</p>
 <pre><span class="c"># 差</span>
@@ -103,7 +136,7 @@ Error: --format must be one of: json, csv, table.
   </div>
 
   <!-- 输出 -->
-  <h2>6. 结构化输出 + stdout/stderr 分流</h2>
+  <h2>7. 结构化输出 + stdout/stderr 分流</h2>
   <div class="card tight">
     <div class="fline"><b>结构化</b><span>优先 JSON / CSV / TSV，而非自由文本——既能被 agent 消费，也能接 <code>jq</code> / <code>cut</code> / <code>awk</code> 组成管道。</span></div>
     <div class="fline"><b>分流</b><span><b>数据走 stdout，进度/警告走 stderr</b>。这样 agent 能拿到干净可解析的结果，同时保留诊断信息。</span></div>
@@ -116,7 +149,7 @@ my-service    running   2025-01-15
   </div>
 
   <!-- 其他考量 -->
-  <h2>7. 其他设计考量</h2>
+  <h2>8. 其他设计考量</h2>
   <div class="card tight">
     <div class="fline"><b>幂等</b><span>agent 可能重试。"不存在才创建" 比 "创建失败于重复" 更安全。</span></div>
     <div class="fline"><b>输入约束</b><span>含糊输入直接报错，别猜。尽量用枚举 / 闭集。</span></div>
@@ -127,7 +160,7 @@ my-service    running   2025-01-15
   </div>
 
   <!-- 完整示例 -->
-  <h2>8. 完整脚本骨架</h2>
+  <h2>9. 完整脚本骨架</h2>
   <div class="card tight">
 <pre>#!/usr/bin/env -S uv run
 # /// script
@@ -155,7 +188,7 @@ if __name__ == "__main__":
   </div>
 
   <!-- 引用 -->
-  <h2>9. 在 SKILL.md 中如何引用</h2>
+  <h2>10. 在 SKILL.md 中如何引用</h2>
   <div class="card tight">
     <p class="muted">先列出可用脚本，再在流程里指示运行方式；路径相对<b>技能根目录</b>（agent 从那里执行命令）。</p>
 <pre>## 可用脚本
@@ -172,6 +205,61 @@ if __name__ == "__main__":
    python3 scripts/process.py --input results.json
    ```</pre>
     <div class="callout"><b>同一套相对路径约定</b>也适用于 <code>references/*.md</code> 里的代码块——命令路径一律相对技能根目录。</div>
+  </div>
+
+  <!-- 自检 -->
+  <h2>11. 交付前自检清单</h2>
+  <div class="card tight">
+    <ul class="checklist">
+      <li>脚本<b>没有任何交互式提示</b>——不会挂起等待输入</li>
+      <li>依赖<b>自带声明</b>（一条命令即可运行），且<b>版本已固定</b></li>
+      <li>带 <code>--help</code>，且包含描述、全部 flag 与用法示例</li>
+      <li>错误信息<b>能自纠</b>——说清错在哪、期望什么、有哪些可选值</li>
+      <li><b>数据走 stdout、诊断走 stderr</b></li>
+      <li>幂等（"不存在才创建"）</li>
+      <li>破坏性操作有 <code>--dry-run</code>，并要求显式确认 flag</li>
+      <li>大输出有限额，或提供 <code>--offset</code> / <code>--output</code></li>
+      <li>已在 <code>SKILL.md</code> 里列出脚本，并写明如何运行</li>
+    </ul>
+  </div>
+
+  <!-- 常见错误 -->
+  <h2>12. 常见错误速查</h2>
+  <div class="card tight">
+    <table>
+      <tr><th style="width:42%">错误</th><th>后果 / 纠正</th></tr>
+      <tr><td>用了 <code>input()</code> / 密码提示 / 确认菜单</td><td>在 agent 环境<b>永久挂起</b> → 全走 flag / 环境变量 / stdin</td></tr>
+      <tr><td>依赖没声明</td><td>跑不起来 → 内联声明依赖 + <b>固定版本</b></td></tr>
+      <tr><td>数据与日志混在一起输出</td><td>难以解析 → <b>数据走 stdout，诊断走 stderr</b></td></tr>
+      <tr><td>错误信息含糊（<code>invalid input</code>）</td><td>白费一轮 → 说清<b>错在哪、期望什么、可选值</b></td></tr>
+      <tr><td>破坏性操作没有 <code>--dry-run</code></td><td>无法先预览 → 加上，并要求显式确认 flag</td></tr>
+      <tr><td>输出体积无上限</td><td>被截断丢关键信息 → 默认给摘要 / 提供 <code>--offset</code> / 要求 <code>--output</code></td></tr>
+      <tr><td>版本浮动（<code>@latest</code>）</td><td>行为漂移 → 固定版本</td></tr>
+      <tr><td>写进 SKILL.md 却没在流程里指明何时跑</td><td>agent 不知道何时用 → 在对应步骤里写明</td></tr>
+    </table>
+  </div>
+
+  <!-- 延伸阅读 -->
+  <h2>13. 延伸阅读</h2>
+  <div class="cards">
+    <a class="navcard" href="references.html">
+      <span class="tag">关联</span>
+      <h3>references/ 撰写指南</h3>
+      <p>脚本负责"确定性的操作"，参考文件负责"按需的知识"——两者常配合使用。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="evals.html">
+      <span class="tag">关联</span>
+      <h3>evals/ 撰写指南</h3>
+      <p>脚本跑得对不对，最终要靠评测来锁定。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="examples.html">
+      <span class="tag">实战</span>
+      <h3>完整示例</h3>
+      <p>看一个真实技能里的脚本是怎么写的、怎么被引用的。</p>
+      <span class="go">查看 →</span>
+    </a>
   </div>
 
   <footer>

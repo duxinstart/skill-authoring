@@ -99,11 +99,11 @@
 ├── references/  <span class="c">…（不变）</span>
 └── scripts/
     ├── scaffold.py           <span class="c"># 生成技能骨架</span>
-    ├── validate.py           <span class="c"># 校验技能（优先调用官方 skills-ref）</span>
+    ├── validate.py           <span class="c"># 校验技能（优先调用 skills-ref）</span>
     └── lint_description.py   <span class="c"># 检查描述长度与触发表述</span></pre>
     <h4>脚本要点（以 validate.py 为例）</h4>
     <div class="fline"><b>自包含</b><span>用 PEP 723 内联声明依赖，一条命令即可运行。</span></div>
-    <div class="fline"><b>可降级</b><span>优先调用官方 <code>skills-ref</code>；未安装时退化为内置格式检查，并在输出的 <code>engine</code> 字段标明用的是哪套。</span></div>
+    <div class="fline"><b>可降级</b><span>优先调用 <code>skills-ref</code>；未安装时退化为内置格式检查，并在输出的 <code>engine</code> 字段标明用的是哪套。</span></div>
     <div class="fline"><b>结构化输出</b><span>JSON 走 stdout，诊断走 stderr，便于 agent 解析。</span></div>
 <pre>{
   "valid": true,
@@ -211,7 +211,7 @@
   <h2>如何验证这个技能真的能用</h2>
   <p class="h2sub">下面这组命令由你手动执行——它们会证明：格式合规、脚本可跑、示例真实。</p>
   <div class="card tight">
-    <h4>① 安装官方校验库（可选，装了 <code>validate.py</code> 会用它）</h4>
+    <h4>① 安装校验库（可选，装了 <code>validate.py</code> 会用它）</h4>
 <pre>cd &lt;agentskills&gt;/skills-ref
 python3 -m venv .venv &amp;&amp; source .venv/bin/activate &amp;&amp; pip install -e .</pre>
 
@@ -230,6 +230,43 @@ python3 skill-authoring/scripts/lint_description.py skill-authoring/evals/files/
 <span class="c"># 预期：对过于笼统的 description 给出 warning</span></pre>
 
     <div class="callout"><b>判定标准</b>：② 与 ③ 应通过；④ 应<b>失败</b>——第 ④ 步失败恰恰说明校验逻辑有效。</div>
+  </div>
+
+  <!-- 自检 -->
+  <h2>照着做时的自检清单</h2>
+  <div class="card tight">
+    <ul class="checklist">
+      <li>是从<b>最小版</b>起步的，没有一开始就建全套目录</li>
+      <li>每加一个目录，都有<b>具体的触发理由</b>（不是"以后可能用到"）</li>
+      <li>加完 <code>references/</code> 后，<code>SKILL.md</code> 里补上了<b>路由</b></li>
+      <li>加完 <code>scripts/</code> 后，脚本被<b>实际跑过</b></li>
+      <li>加完 <code>assets/</code> 后，资源在路由里写了<b>何时用</b></li>
+      <li>加完 <code>evals/</code> 后，用例的<b>提示词是真实的</b></li>
+      <li>最终 <code>SKILL.md</code> 里没有"偶尔才用"的细节残留</li>
+    </ul>
+  </div>
+
+  <!-- 延伸阅读 -->
+  <h2>延伸阅读</h2>
+  <div class="cards">
+    <a class="navcard" href="skill-md.html">
+      <span class="tag">核心</span>
+      <h3>SKILL.md 撰写指南</h3>
+      <p>示例里每一处正文写法，背后都有对应的方法。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="design.html">
+      <span class="tag">方法</span>
+      <h3>目录取舍与设计流程</h3>
+      <p>示例里那五个阶段，就是这条演进路径的展开。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="structure-detail.html">
+      <span class="tag">总览</span>
+      <h3>目录结构详解</h3>
+      <p>每个目录具体装什么、何时被读。</p>
+      <span class="go">查看 →</span>
+    </a>
   </div>
 
   <footer>

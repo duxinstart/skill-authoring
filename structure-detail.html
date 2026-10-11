@@ -31,6 +31,7 @@
   <div class="crumb"><a href="index.html">首页</a> / 目录结构详解</div>
   <h1>目录结构详解</h1>
   <p class="sub">每个文件「装什么、何时被读、为何单独拆出来」。判断标准只有一条：<b>agent 需要它时，能否凭 SKILL.md 里的触发条件准确找到并按需加载？</b></p>
+  <p class="muted" style="margin-top:10px">本页是<b>总览</b>：说明每个目录的职责与边界；具体怎么写，见各专项页。标 <span class="badge req">必需</span> 的是技能运行所必需，其余为可选。</p>
 
   <!-- SKILL.md -->
   <div class="dirblock">
@@ -140,7 +141,7 @@
   <div class="dirblock">
     <div class="dirhead">
       <div class="dirtitle"><span class="nm">evals/</span><span class="badge opt">可选</span></div>
-      <p class="dirpurpose">技能的<b>质量测试</b>。回答「这个技能可靠吗、比没有它强多少」。来自官方《评测技能》指南的约定。撰写细节见 <a class="inline" href="evals.html">evals/ 撰写指南</a>。</p>
+      <p class="dirpurpose">技能的<b>质量测试</b>。回答「这个技能可靠吗、比没有它强多少」，并给出可迭代的反馈闭环。撰写细节见 <a class="inline" href="evals.html">evals/ 撰写指南</a>。</p>
     </div>
     <div class="file">
       <div class="fhead"><span class="fname">evals.json</span><span class="ftag">测试用例 + 断言</span></div>
@@ -195,6 +196,42 @@
       <div class="fhead"><span class="fname">一个常见错误</span><span class="ftag gray">陷阱</span></div>
       <div class="fline"><b>别把指令写进 README</b><span><b>agent 根本不读 README。</b>任何"希望 agent 照做"的内容，都必须写进 <code>SKILL.md</code> 或它引用的文件。</span></div>
     </div>
+  </div>
+
+  <!-- 自检 -->
+  <h2>交付前自检清单</h2>
+  <div class="card tight">
+    <ul class="checklist">
+      <li>根目录有 <code>SKILL.md</code>，且 <code>name</code> 与目录名一致</li>
+      <li>目录名 = 技能名（kebab-case）</li>
+      <li>每个已存在的目录都有<b>明确用途</b>，不是"以后可能用到"</li>
+      <li>每个资源文件都能在 <code>SKILL.md</code> 里找到<b>触发条件</b></li>
+      <li>引用一律相对路径，且只<b>一层深</b></li>
+      <li>没有把给 agent 的指令写进 <code>README</code></li>
+    </ul>
+  </div>
+
+  <!-- 延伸阅读 -->
+  <h2>延伸阅读</h2>
+  <div class="cards">
+    <a class="navcard" href="skill-md.html">
+      <span class="tag">核心</span>
+      <h3>SKILL.md 撰写指南</h3>
+      <p>入口文档怎么写——整个技能的路由都从这里出发。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="design.html">
+      <span class="tag">方法</span>
+      <h3>目录取舍与设计流程</h3>
+      <p>什么时候才该建哪个目录。</p>
+      <span class="go">查看 →</span>
+    </a>
+    <a class="navcard" href="examples.html">
+      <span class="tag">实战</span>
+      <h3>完整示例</h3>
+      <p>看一个真实技能从最小版长成完整版的全过程。</p>
+      <span class="go">查看 →</span>
+    </a>
   </div>
 
   <footer>
