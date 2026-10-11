@@ -4,165 +4,672 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agent Skill 目录结构规范</title>
+<meta name="description" content="Agent Skill 撰写规范站点：目录结构、SKILL.md 写法、描述与触发、各资源目录与设计流程。">
 <link rel="stylesheet" href="skill-spec.css">
 </head>
-<body>
+<body class="theme-dark">
 
-<header class="topbar">
-  <div class="inner">
-    <a class="brand" href="index.html">Agent Skill 规范 <span>/ 目录结构</span></a>
-    <nav class="topnav">
-      <a href="index.html" class="active">首页</a>
-      <a href="structure-detail.html">结构详解</a>
-      <a href="skill-md.html">SKILL.md</a>
-      <a href="description.html">描述优化</a>
-      <a href="examples.html">示例</a>
-      <a href="references.html">references/</a>
-      <a href="scripts.html">scripts/</a>
-      <a href="assets.html">assets/</a>
-      <a href="evals.html">evals/</a>
-      <a href="design.html">设计流程</a>
+<header class="topbar" id="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">AS</span>
+      <span class="brand-text">Agent Skill 规范</span>
+    </a>
+
+    <nav class="topnav" id="topnav" aria-label="站点导航">
+      <div class="navgroup active">
+        <button class="navgroup-btn" type="button" aria-expanded="false">核心
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="navgroup-menu">
+          <a href="index.html" class="active"><b>首页 · 总览</b><span>什么是 Agent Skill、渐进式加载与目录总览</span></a>
+          <a href="structure-detail.html"><b>目录结构详解</b><span>每个文件装什么、何时被读、为何要单独拆出来</span></a>
+          <a href="skill-md.html"><b>SKILL.md 撰写指南</b><span>frontmatter 逐字段详解、正文结构与写作原则</span></a>
+          <a href="description.html"><b>描述与触发优化</b><span>description 决定触发；五条原则与优化闭环</span></a>
+        </div>
+      </div>
+      <div class="navgroup">
+        <button class="navgroup-btn" type="button" aria-expanded="false">资源
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="navgroup-menu">
+          <a href="references.html"><b>references/ 撰写指南</b><span>主技术参考、领域知识、条件触发文档与 FORMS.md</span></a>
+          <a href="scripts.html"><b>scripts/ 撰写指南</b><span>自包含依赖、非交互、错误自纠与 stdout/stderr 分流</span></a>
+          <a href="assets.html"><b>assets/ 撰写指南</b><span>templates / schemas / data 三类静态资源</span></a>
+          <a href="evals.html"><b>evals/ 撰写指南</b><span>evals.json 结构、用例设计、断言与判分迭代</span></a>
+        </div>
+      </div>
+      <div class="navgroup">
+        <button class="navgroup-btn" type="button" aria-expanded="false">方法
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="navgroup-menu">
+          <a href="design.html"><b>目录取舍与设计流程</b><span>什么时候才需要哪个目录；六步演进路径</span></a>
+          <a href="examples.html"><b>完整示例</b><span>真实技能从最小版长成完整版的全过程</span></a>
+        </div>
+      </div>
     </nav>
+
+    <button class="search-btn" id="searchBtn" type="button" aria-label="站内搜索">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="m11 11 3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span class="search-btn-text">搜索</span>
+      <kbd>/</kbd>
+    </button>
+
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="展开导航" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
 
-<div class="wrap">
-
-  <div class="hero">
-    <h1>Agent Skill 目录结构规范</h1>
-    <p class="sub">一个技能 = 一个文件夹，核心是 <code>SKILL.md</code>。其余目录按需组织、按需加载。本页是总览入口，详细写法见各子页。</p>
+<section class="hero">
+  <div class="hero-card">
+    <div class="hero-body">
+      <p class="eyebrow">A specification for authoring</p>
+      <h1>Agent Skill 目录结构规范</h1>
+      <div class="hero-foot">
+        <p class="sub">一个技能 = 一个文件夹，核心是 <code>SKILL.md</code>。其余目录按需组织、按需加载。本页是总览入口，详细写法见各子页。</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="structure-detail.html">从目录结构开始读<span class="btn-dot" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+          <a class="btn ghost" href="skill-md.html">看 SKILL.md 指南</a>
+        </div>
+      </div>
+    </div>
   </div>
+</section>
 
-  <div class="card tight">
-    <h4>怎么用这个站点</h4>
-    <div class="fline"><b>给谁看</b><span>需要<b>自己动手写 Skill</b>、但还没有规范可依、不知道文档该怎么写的开发者。<b>不需要任何前置知识</b>。</span></div>
-    <div class="fline"><b>怎么读</b><span>先看下面的目录总览建立整体印象，再按「详细说明」的卡片顺序逐页读。<b>新手建议按卡片顺序走一遍</b>。</span></div>
-    <div class="fline"><b>目录标记</b><span><span class="badge req">必需</span> 技能运行所必需；<span class="badge opt">可选</span> 按需添加；<span class="badge hum">给人看</span> <b>不进模型上下文</b>。</span></div>
-    <div class="fline"><b>规则标记</b><span><i class="mk hard">硬性</i> 违反会导致技能无法被加载；<i class="mk advice">建议</i> 不做不报错但效果差；<i class="mk exp">实验性</i> 客户端支持不一。</span></div>
-  </div>
+<div class="shell">
+  <main class="content" id="content">
+    <section class="search-block" id="searchBlock">
+      <h2>站内搜索</h2>
+      <div class="search-field">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="m11 11 3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <input id="homeSearch" type="search" aria-label="站内搜索"
+               placeholder="搜索文档标题与关键词，例如 frontmatter、触发、evals"
+               autocomplete="off" spellcheck="false">
+      </div>
+      <div class="search-results" id="homeResults" hidden></div>
+      <div class="quicktags">
+        <span class="label">常用入口</span>
+        <a class="tag-pill" href="#q=frontmatter">frontmatter 字段</a>
+        <a class="tag-pill" href="#q=description">description 写法</a>
+        <a class="tag-pill" href="#q=触发">触发优化</a>
+        <a class="tag-pill" href="#q=脚本">scripts 脚本</a>
+        <a class="tag-pill" href="#q=评测">evals 评测</a>
+        <a class="tag-pill" href="#q=设计">目录取舍</a>
+      </div>
+    </section>
 
-  <h2>什么是 Agent Skill</h2>
-  <p class="muted">Skill 是用于扩展 AI agent 能力的轻量开放格式。它把「程序性知识」和「团队/项目专有上下文」打包成可移植、可版本化的文件夹，agent 按需加载。加载遵循<b>渐进式披露</b>：启动时只读 <code>name</code> + <code>description</code>（约 100 tokens），任务命中时才读整篇 <code>SKILL.md</code>，其余资源（脚本、参考、模板）在真正引用时才加载。</p>
+    <div class="card tight">
+      <h4>怎么用这个站点</h4>
+      <div class="fline"><b>给谁看</b><span>需要<b>自己动手写 Skill</b>、但还没有规范可依、不知道文档该怎么写的开发者。<b>不需要任何前置知识</b>。</span></div>
+      <div class="fline"><b>怎么读</b><span>先看下面的目录总览建立整体印象，再按「详细说明」的卡片顺序逐页读。<b>新手建议按卡片顺序走一遍</b>。</span></div>
+      <div class="fline"><b>目录标记</b><span><span class="badge req">必需</span> 技能运行所必需；<span class="badge opt">可选</span> 按需添加；<span class="badge hum">给人看</span> <b>不进模型上下文</b>。</span></div>
+      <div class="fline"><b>规则标记</b><span><i class="mk hard">硬性</i> 违反会导致技能无法被加载；<i class="mk advice">建议</i> 不做不报错但效果差；<i class="mk exp">实验性</i> 客户端支持不一。</span></div>
+    </div>
 
-  <h2>目录结构总览</h2>
-  <div class="legend">
-    <span><i class="dot req"></i>必需</span>
-    <span><i class="dot opt"></i>可选（按需加载）</span>
-    <span><i class="dot hum"></i>给人看（不进模型上下文）</span>
-  </div>
-  <div class="card">
-    <ul class="tree">
-      <li>
-        <div class="row"><span class="nm root">skill-name/</span><span class="desc">技能根目录 · 目录名 = 技能名（kebab-case）</span></div>
-        <ul>
-          <li><div class="row"><span class="nm">SKILL.md</span><span class="badge req">必需</span><span class="desc">入口 + 资源路由表</span></div></li>
-          <li>
-            <div class="row"><span class="nm">references/</span><span class="badge opt">可选</span><span class="desc">按需加载的知识库</span></div>
-            <ul>
-              <li><div class="row"><span class="nm">REFERENCE.md</span><span class="desc">主技术参考</span></div></li>
-              <li><div class="row"><span class="nm">&lt;domain&gt;.md</span><span class="desc">领域知识（finance.md / legal.md …）</span></div></li>
-              <li><div class="row"><span class="nm">api-errors.md</span><span class="desc">条件触发的主题文档</span></div></li>
-              <li><div class="row"><span class="nm">FORMS.md</span><span class="desc">表单 / 结构化数据格式</span></div></li>
-            </ul>
-          </li>
-          <li>
-            <div class="row"><span class="nm">scripts/</span><span class="badge opt">可选</span><span class="desc">可执行脚本 · 确定性操作</span></div>
-            <ul>
-              <li><div class="row"><span class="nm">build-report.py</span><span class="desc">业务脚本（自包含）</span></div></li>
-              <li><div class="row"><span class="nm">validate.sh</span><span class="desc">校验脚本</span></div></li>
-            </ul>
-          </li>
-          <li>
-            <div class="row"><span class="nm">assets/</span><span class="badge opt">可选</span><span class="desc">静态资源</span></div>
-            <ul>
-              <li><div class="row"><span class="nm">templates/</span><span class="desc">输出模板</span></div></li>
-              <li><div class="row"><span class="nm">schemas/</span><span class="desc">数据结构定义</span></div></li>
-              <li><div class="row"><span class="nm">data/</span><span class="desc">查找表</span></div></li>
-            </ul>
-          </li>
-          <li>
-            <div class="row"><span class="nm">evals/</span><span class="badge opt">可选</span><span class="desc">评测</span></div>
-            <ul>
-              <li><div class="row"><span class="nm">evals.json</span><span class="desc">测试用例 + 断言</span></div></li>
-              <li><div class="row"><span class="nm">files/</span><span class="desc">测试输入文件</span></div></li>
-            </ul>
-          </li>
-          <li>
-            <div class="row"><span class="nm">agents/</span><span class="badge opt">可选</span><span class="desc">厂商特定配置 · 非标准</span></div>
-            <ul>
-              <li><div class="row"><span class="nm">*.yaml</span><span class="desc">UI 元数据 / 依赖 / 调用策略</span></div></li>
-            </ul>
-          </li>
-          <li><div class="row"><span class="nm">README / LICENSE / CHANGELOG</span><span class="badge hum">给人看</span><span class="desc">通常不必加；有分发要求时才用</span></div></li>
-        </ul>
-      </li>
-    </ul>
-  </div>
+    <h2>什么是 Agent Skill</h2>
+    <p class="muted">Skill 是用于扩展 AI agent 能力的轻量开放格式。它把「程序性知识」和「团队/项目专有上下文」打包成可移植、可版本化的文件夹，agent 按需加载。加载遵循<b>渐进式披露</b>：启动时只读 <code>name</code> + <code>description</code>（约 100 tokens），任务命中时才读整篇 <code>SKILL.md</code>，其余资源（脚本、参考、模板）在真正引用时才加载。</p>
 
-  <h2>详细说明</h2>
-  <p class="h2sub">点击卡片进入对应子页。建议阅读顺序：结构详解 → SKILL.md → 描述优化 → 完整示例 → 各资源目录 → 设计流程。</p>
-  <div class="cards">
-    <a class="navcard" href="structure-detail.html">
-      <span class="tag">总览</span>
-      <h3>目录结构详解</h3>
-      <p>每个文件「装什么、何时被读、为何单独拆出来」——含 references、scripts、assets、evals 全部条目。</p>
-      <span class="go">查看 →</span>
-    </a>
-    <a class="navcard" href="skill-md.html">
-      <span class="tag">核心</span>
-      <h3>SKILL.md 撰写指南</h3>
-      <p>frontmatter 逐字段详解、推荐的正文结构、写作原则、常用模式、交付前自检清单。全文三色标注硬性/建议/实验性。</p>
-      <span class="go">查看 →</span>
-    </a>
-    <a class="navcard" href="description.html">
-      <span class="tag">触发</span>
-      <h3>描述与触发优化</h3>
-      <p>description 决定技能能否被触发。含五条写作原则、好差对照，以及完整的触发优化闭环（查询集、触发率、训练/验证切分）。</p>
-      <span class="go">查看 →</span>
-    </a>
-    <a class="navcard" href="examples.html">
-      <span class="tag">实战</span>
-      <h3>完整示例：skill-authoring</h3>
-      <p>一个真实技能从最小版逐阶段长成完整版的全过程，含完整目录总览与可手动执行的验证步骤。</p>
-      <span class="go">查看 →</span>
-    </a>
-    <a class="navcard" href="references.html">
-      <span class="tag">资源</span>
-      <h3>references/ 撰写指南</h3>
-      <p>REFERENCE.md、&lt;domain&gt;.md、条件触发文档、FORMS.md 的内容模板与写法。</p>
-      <span class="go">查看 →</span>
-    </a>
-    <a class="navcard" href="scripts.html">
-      <span class="tag">资源</span>
-      <h3>scripts/ 撰写指南</h3>
-      <p>自包含依赖、非交互、--help、错误自纠、结构化输出与 stdout/stderr 分流，附完整脚本骨架。</p>
-      <span class="go">查看 →</span>
-    </a>
-    <a class="navcard" href="assets.html">
-      <span class="tag">资源</span>
-      <h3>assets/ 撰写指南</h3>
-      <p>templates / schemas / data 三类静态资源各自装什么、怎么组织、何时内联 vs 外置。</p>
-      <span class="go">查看 →</span>
-    </a>
-    <a class="navcard" href="evals.html">
-      <span class="tag">质量</span>
-      <h3>evals/ 撰写指南</h3>
-      <p>evals.json 结构逐字段详解、用例设计、断言好坏对照、运行与迭代方式。</p>
-      <span class="go">查看 →</span>
-    </a>
-    <a class="navcard" href="design.html">
-      <span class="tag">方法</span>
-      <h3>目录取舍与设计流程</h3>
-      <p>每个目录「什么时候才需要」，以及从最小可用到完整结构的六步演进路径。</p>
-      <span class="go">查看 →</span>
-    </a>
-  </div>
+    <h2>目录结构总览</h2>
+    <div class="legend">
+      <span><i class="dot req"></i>必需</span>
+      <span><i class="dot opt"></i>可选（按需加载）</span>
+      <span><i class="dot hum"></i>给人看（不进模型上下文）</span>
+    </div>
+    <div class="card">
+      <ul class="tree">
+        <li>
+          <div class="row"><span class="nm root">skill-name/</span><span class="desc">技能根目录 · 目录名 = 技能名（kebab-case）</span></div>
+          <ul>
+            <li><div class="row"><span class="nm">SKILL.md</span><span class="badge req">必需</span><span class="desc">入口 + 资源路由表</span></div></li>
+            <li>
+              <div class="row"><span class="nm">references/</span><span class="badge opt">可选</span><span class="desc">按需加载的知识库</span></div>
+              <ul>
+                <li><div class="row"><span class="nm">REFERENCE.md</span><span class="desc">主技术参考</span></div></li>
+                <li><div class="row"><span class="nm">&lt;domain&gt;.md</span><span class="desc">领域知识（finance.md / legal.md …）</span></div></li>
+                <li><div class="row"><span class="nm">api-errors.md</span><span class="desc">条件触发的主题文档</span></div></li>
+                <li><div class="row"><span class="nm">FORMS.md</span><span class="desc">表单 / 结构化数据格式</span></div></li>
+              </ul>
+            </li>
+            <li>
+              <div class="row"><span class="nm">scripts/</span><span class="badge opt">可选</span><span class="desc">可执行脚本 · 确定性操作</span></div>
+              <ul>
+                <li><div class="row"><span class="nm">build-report.py</span><span class="desc">业务脚本（自包含）</span></div></li>
+                <li><div class="row"><span class="nm">validate.sh</span><span class="desc">校验脚本</span></div></li>
+              </ul>
+            </li>
+            <li>
+              <div class="row"><span class="nm">assets/</span><span class="badge opt">可选</span><span class="desc">静态资源</span></div>
+              <ul>
+                <li><div class="row"><span class="nm">templates/</span><span class="desc">输出模板</span></div></li>
+                <li><div class="row"><span class="nm">schemas/</span><span class="desc">数据结构定义</span></div></li>
+                <li><div class="row"><span class="nm">data/</span><span class="desc">查找表</span></div></li>
+              </ul>
+            </li>
+            <li>
+              <div class="row"><span class="nm">evals/</span><span class="badge opt">可选</span><span class="desc">评测</span></div>
+              <ul>
+                <li><div class="row"><span class="nm">evals.json</span><span class="desc">测试用例 + 断言</span></div></li>
+                <li><div class="row"><span class="nm">files/</span><span class="desc">测试输入文件</span></div></li>
+              </ul>
+            </li>
+            <li>
+              <div class="row"><span class="nm">agents/</span><span class="badge opt">可选</span><span class="desc">厂商特定配置 · 非标准</span></div>
+              <ul>
+                <li><div class="row"><span class="nm">*.yaml</span><span class="desc">UI 元数据 / 依赖 / 调用策略</span></div></li>
+              </ul>
+            </li>
+            <li><div class="row"><span class="nm">README / LICENSE / CHANGELOG</span><span class="badge hum">给人看</span><span class="desc">通常不必加；有分发要求时才用</span></div></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
 
-  <footer>
-    <span>依据 agentskills.io 规范整理 · 大技能 = 薄 SKILL.md（路由）+ 厚的按需资源</span>
-    <span><a href="design.html">下一步：目录取舍与设计流程 →</a></span>
-  </footer>
+    <h2>详细说明</h2>
+    <p class="h2sub">点击卡片进入对应子页。建议阅读顺序：结构详解 → SKILL.md → 描述优化 → 完整示例 → 各资源目录 → 设计流程。</p>
+    <div class="cards">
+      <a class="navcard" href="structure-detail.html">
+        <span class="tag">总览</span>
+        <h3>目录结构详解</h3>
+        <p>每个文件「装什么、何时被读、为何单独拆出来」——含 references、scripts、assets、evals 全部条目。</p>
+        <span class="go">查看 →</span>
+      </a>
+      <a class="navcard" href="skill-md.html">
+        <span class="tag">核心</span>
+        <h3>SKILL.md 撰写指南</h3>
+        <p>frontmatter 逐字段详解、推荐的正文结构、写作原则、常用模式、交付前自检清单。全文三色标注硬性/建议/实验性。</p>
+        <span class="go">查看 →</span>
+      </a>
+      <a class="navcard" href="description.html">
+        <span class="tag">触发</span>
+        <h3>描述与触发优化</h3>
+        <p>description 决定技能能否被触发。含五条写作原则、好差对照，以及完整的触发优化闭环（查询集、触发率、训练/验证切分）。</p>
+        <span class="go">查看 →</span>
+      </a>
+      <a class="navcard" href="examples.html">
+        <span class="tag">实战</span>
+        <h3>完整示例（待重建）</h3>
+        <p>原示例已移除——未经「示例要求说明书」定义与验收。待示例要求确定后重建。</p>
+        <span class="go">查看 →</span>
+      </a>
+      <a class="navcard" href="references.html">
+        <span class="tag">资源</span>
+        <h3>references/ 撰写指南</h3>
+        <p>REFERENCE.md、&lt;domain&gt;.md、条件触发文档、FORMS.md 的内容模板与写法。</p>
+        <span class="go">查看 →</span>
+      </a>
+      <a class="navcard" href="scripts.html">
+        <span class="tag">资源</span>
+        <h3>scripts/ 撰写指南</h3>
+        <p>自包含依赖、非交互、--help、错误自纠、结构化输出与 stdout/stderr 分流，附完整脚本骨架。</p>
+        <span class="go">查看 →</span>
+      </a>
+      <a class="navcard" href="assets.html">
+        <span class="tag">资源</span>
+        <h3>assets/ 撰写指南</h3>
+        <p>templates / schemas / data 三类静态资源各自装什么、怎么组织、何时内联 vs 外置。</p>
+        <span class="go">查看 →</span>
+      </a>
+      <a class="navcard" href="evals.html">
+        <span class="tag">质量</span>
+        <h3>evals/ 撰写指南</h3>
+        <p>evals.json 结构逐字段详解、用例设计、断言好坏对照、运行与迭代方式。</p>
+        <span class="go">查看 →</span>
+      </a>
+      <a class="navcard" href="design.html">
+        <span class="tag">方法</span>
+        <h3>目录取舍与设计流程</h3>
+        <p>每个目录「什么时候才需要」，以及从最小可用到完整结构的六步演进路径。</p>
+        <span class="go">查看 →</span>
+      </a>
+    </div>
 
+    <footer>
+      <span>依据 agentskills.io 规范整理 · 大技能 = 薄 SKILL.md（路由）+ 厚的按需资源</span>
+      <span><a href="design.html">下一步：目录取舍与设计流程 →</a></span>
+    </footer>
+  </main>
 </div>
+
+<!-- 站内搜索面板（全站可用，索引见页内脚本） -->
+<div class="palette" id="palette" hidden>
+  <div class="palette-mask" data-close></div>
+  <div class="palette-box" role="dialog" aria-modal="true" aria-label="站内搜索">
+    <div class="palette-head">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="m11 11 3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input id="paletteInput" type="search" placeholder="搜索文档标题、关键词…" autocomplete="off" spellcheck="false">
+      <button class="palette-esc" type="button" data-close>Esc</button>
+    </div>
+    <div class="palette-body" id="paletteBody"></div>
+    <div class="palette-foot">↑↓ 选择 · Enter 打开 · Esc 关闭</div>
+  </div>
+</div>
+
+<!-- 回到顶部 -->
+<button class="to-top" id="toTop" type="button" aria-label="回到顶部" hidden>
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 13V3.5M8 3.5 4 7.5M8 3.5l4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<script>
+/* ==========================================================================
+   全站交互脚本（内联在各页，保证单页可独立打开）
+   1 顶部导航滚动阴影 · 2 移动端导航 · 3 分组下拉 · 4 侧边目录（生成/折叠/高亮）
+   5 代码块复制 · 6 回到顶部 · 7 站内搜索（面板 + 首页搜索区）
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  var $  = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+  /* ---------- 站内搜索索引（与 README 的页面清单保持同步） ---------- */
+  var SEARCH_INDEX = [
+    { t: '首页 · 总览',            u: 'index.html',            d: '什么是 Agent Skill、渐进式加载、目录结构总览',   k: '首页 总览 渐进式披露 目录结构' },
+    { t: '目录结构详解',            u: 'structure-detail.html', d: '每个文件装什么、何时被读、为何要单独拆出来',       k: '目录 结构 详解 references scripts assets evals agents' },
+    { t: 'SKILL.md 撰写指南',       u: 'skill-md.html',         d: 'frontmatter 逐字段详解、正文结构与写作原则',       k: 'skill.md frontmatter name description license compatibility metadata allowed-tools 正文结构' },
+    { t: '描述与触发优化',          u: 'description.html',      d: 'description 决定触发；五条原则与触发优化闭环',      k: 'description 描述 触发 优化 查询集 触发率 验证集' },
+    { t: 'references/ 撰写指南',    u: 'references.html',       d: '主技术参考、领域知识、条件触发文档与 FORMS.md',     k: 'references reference.md domain forms 领域 参考 条件触发' },
+    { t: 'scripts/ 撰写指南',       u: 'scripts.html',          d: '自包含依赖、非交互、错误自纠与 stdout/stderr 分流', k: 'scripts 脚本 自包含 非交互 help 退出码 dry-run stdout stderr' },
+    { t: 'assets/ 撰写指南',        u: 'assets.html',           d: 'templates / schemas / data 三类静态资源',          k: 'assets templates schemas data 模板 查找表 数据结构' },
+    { t: 'evals/ 撰写指南',         u: 'evals.html',            d: 'evals.json 结构、用例设计、断言与判分迭代',         k: 'evals 评测 断言 用例 判分 迭代' },
+    { t: '目录取舍与设计流程',      u: 'design.html',           d: '什么时候才需要哪个目录；六步演进路径',             k: '设计 流程 取舍 演进 决策 最小可用' },
+    { t: '完整示例',                u: 'examples.html',         d: '真实技能从最小版长成完整版的全过程（待重建）',       k: '示例 example 实战 演进' }
+  ];
+
+  /* ---------- 1 / 6. 顶部导航阴影 + 回到顶部显隐 ---------- */
+  var topbar = $('#topbar');
+  var toTop = $('#toTop');
+
+  function syncTopbar() {
+    if (topbar) topbar.classList.toggle('scrolled', window.scrollY > 8);
+  }
+  function syncToTop() {
+    if (toTop) toTop.hidden = window.scrollY <= 420;
+  }
+  if (toTop) {
+    toTop.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () {
+      syncTopbar(); syncToTop(); syncSpy();
+      ticking = false;
+    });
+  }, { passive: true });
+
+  /* ---------- 2. 移动端导航抽屉 ---------- */
+  var navToggle = $('#navToggle');
+  var topnav = $('#topnav');
+  if (navToggle && topnav) {
+    navToggle.addEventListener('click', function () {
+      var open = topnav.classList.toggle('open');
+      navToggle.classList.toggle('is-open', open);
+      navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+
+  /* ---------- 3. 分组下拉（点击切换；桌面悬停由 CSS 负责） ---------- */
+  function closeGroups() {
+    $$('.navgroup.open').forEach(function (g) {
+      g.classList.remove('open');
+      var b = $('.navgroup-btn', g);
+      if (b) b.setAttribute('aria-expanded', 'false');
+    });
+  }
+  $$('.navgroup-btn').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var group = btn.parentNode;
+      var willOpen = !group.classList.contains('open');
+      closeGroups();
+      if (willOpen) {
+        group.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+  document.addEventListener('click', closeGroups);
+
+  /* ---------- 4. 侧边目录 ---------- */
+  var content = $('#content');
+  var tocBox = $('#toc');
+  var sidebar = $('#sidebar');
+  var sidebarHead = $('#sidebarHead');
+  var spyItems = [];
+
+  if (sidebarHead && sidebar) {
+    var toggleSidebar = function () {
+      var open = sidebar.classList.toggle('open');
+      sidebarHead.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+    sidebarHead.addEventListener('click', toggleSidebar);
+    sidebarHead.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSidebar(); }
+    });
+  }
+
+  if (content && tocBox) {
+    /* 4.1 收集章节：h2 与 .dirblock 为一级，其间的 h3 为二级 */
+    var groups = [];
+    var cursor = null;
+    $$('h2, h3, .dirblock', content).forEach(function (node) {
+      if (node.classList.contains('dirblock')) {
+        var nm = $('.dirtitle .nm', node);
+        groups.push({ el: node, label: nm ? nm.textContent.trim() : '目录', kids: [] });
+        cursor = null;
+      } else if (node.tagName === 'H2') {
+        cursor = { el: node, label: node.textContent.trim(), kids: [] };
+        groups.push(cursor);
+      } else if (node.tagName === 'H3' && cursor) {
+        cursor.kids.push({ el: node, label: node.textContent.trim() });
+      }
+    });
+
+    /* 4.2 渲染目录 */
+    var seq = 0;
+    groups.forEach(function (g) {
+      if (!g.el.id) g.el.id = 'sec-' + (++seq);
+
+      var item = document.createElement('div');
+      item.className = 'toc-item';
+      var row = document.createElement('div');
+      row.className = 'toc-row';
+
+      var link = document.createElement('a');
+      link.className = 'toc-link';
+      link.href = '#' + g.el.id;
+      link.textContent = g.label;
+      link.title = g.label;
+      row.appendChild(link);
+      spyItems.push({ el: g.el, link: link });
+
+      item.appendChild(row);
+
+      if (g.kids.length) {
+        var caret = document.createElement('button');
+        caret.type = 'button';
+        caret.className = 'toc-caret';
+        caret.setAttribute('aria-label', '折叠或展开本节');
+        caret.setAttribute('aria-expanded', 'true');
+        caret.innerHTML = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 4.5 6 7.5 9 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        row.appendChild(caret);
+
+        var sub = document.createElement('div');
+        sub.className = 'toc-sub';
+        g.kids.forEach(function (k) {
+          if (!k.el.id) k.el.id = 'sec-' + (++seq);
+          var ka = document.createElement('a');
+          ka.className = 'toc-link toc-link-sub';
+          ka.href = '#' + k.el.id;
+          ka.textContent = k.label;
+          ka.title = k.label;
+          sub.appendChild(ka);
+          spyItems.push({ el: k.el, link: ka });
+        });
+        item.appendChild(sub);
+
+        caret.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var collapsed = item.classList.toggle('collapsed');
+          caret.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        });
+      }
+
+      tocBox.appendChild(item);
+    });
+
+    /* 4.3 移动端点击目录项后收起面板 */
+    tocBox.addEventListener('click', function (e) {
+      if (e.target.closest('.toc-caret')) return;
+      if (window.innerWidth <= 1024 && sidebar) sidebar.classList.remove('open');
+    });
+
+    /* 4.4 本页无小节时隐藏侧栏，正文单栏居中 */
+    if (!groups.length) {
+      var layout = sidebar ? sidebar.parentNode : null;
+      if (sidebar) sidebar.hidden = true;
+      if (layout) layout.classList.add('no-sidebar');
+    }
+  }
+
+  /* 滚动高亮当前章节 */
+  function syncSpy() {
+    if (!spyItems.length) return;
+
+    var line = window.scrollY + 140;
+    var active = spyItems[0];
+    for (var i = 0; i < spyItems.length; i++) {
+      var top = spyItems[i].el.getBoundingClientRect().top + window.scrollY;
+      if (top <= line) active = spyItems[i];
+    }
+    if (active.link.classList.contains('active')) return;
+
+    spyItems.forEach(function (it) { it.link.classList.toggle('active', it === active); });
+
+    var item = active.link.parentNode;
+    if (item && item.classList.contains('collapsed')) item.classList.remove('collapsed');
+
+    /* 让当前项保持在目录可视区内 */
+    if (tocBox && tocBox.clientHeight > 60 && tocBox.scrollHeight > tocBox.clientHeight + 4) {
+      var lr = active.link.getBoundingClientRect();
+      var cr = tocBox.getBoundingClientRect();
+      var pad = 44;
+      if (lr.top < cr.top + pad) tocBox.scrollTop -= (cr.top + pad - lr.top);
+      else if (lr.bottom > cr.bottom - pad) tocBox.scrollTop += (lr.bottom - cr.bottom + pad);
+    }
+  }
+
+  /* ---------- 5. 代码块复制按钮 ---------- */
+  $$('pre').forEach(function (pre) {
+    if (pre.parentNode && pre.parentNode.classList && pre.parentNode.classList.contains('code-block')) return;
+
+    var box = document.createElement('div');
+    box.className = 'code-block';
+    pre.parentNode.insertBefore(box, pre);
+    box.appendChild(pre);
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'code-copy';
+    btn.textContent = '复制';
+    btn.addEventListener('click', function () {
+      var text = pre.innerText;
+      var done = function () {
+        btn.textContent = '已复制';
+        window.setTimeout(function () { btn.textContent = '复制'; }, 1600);
+      };
+      var fallback = function () {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.top = '-1000px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (err) { /* 忽略 */ }
+        document.body.removeChild(ta);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else {
+        fallback();
+      }
+    });
+    box.appendChild(btn);
+  });
+
+  /* ---------- 7. 站内搜索 ---------- */
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function highlight(text, q) {
+    if (!q) return escapeHtml(text);
+    var i = text.toLowerCase().indexOf(q.toLowerCase());
+    if (i < 0) return escapeHtml(text);
+    return escapeHtml(text.slice(0, i)) + '<mark>' + escapeHtml(text.slice(i, i + q.length)) +
+           '</mark>' + escapeHtml(text.slice(i + q.length));
+  }
+  function search(q) {
+    q = (q || '').trim();
+    if (!q) return SEARCH_INDEX.slice();
+    var lower = q.toLowerCase();
+    return SEARCH_INDEX.filter(function (item) {
+      return (item.t + ' ' + item.d + ' ' + item.k).toLowerCase().indexOf(lower) >= 0;
+    });
+  }
+
+  var palette = $('#palette');
+  var paletteInput = $('#paletteInput');
+  var paletteBody = $('#paletteBody');
+  var searchBtn = $('#searchBtn');
+  var activeIdx = -1;
+
+  function renderPalette(q) {
+    if (!paletteBody) return;
+    activeIdx = -1;
+    var list = search(q);
+    if (!list.length) {
+      paletteBody.innerHTML = '<div class="palette-empty">没有匹配的文档，试试「frontmatter」「触发」「evals」</div>';
+      return;
+    }
+    paletteBody.innerHTML = list.map(function (item) {
+      return '<a class="palette-item" href="' + item.u + '">' +
+             '<b>' + highlight(item.t, q) + '</b><span>' + highlight(item.d, q) + '</span></a>';
+    }).join('');
+  }
+
+  function moveActive(step) {
+    if (!paletteBody) return;
+    var items = $$('.palette-item', paletteBody);
+    if (!items.length) return;
+    var idx = activeIdx + step;
+    if (idx < 0) idx = items.length - 1;
+    if (idx >= items.length) idx = 0;
+    activeIdx = idx;
+    items.forEach(function (el, i) { el.classList.toggle('is-active', i === idx); });
+
+    var pr = items[idx].getBoundingClientRect();
+    var br = paletteBody.getBoundingClientRect();
+    if (pr.top < br.top) paletteBody.scrollTop -= (br.top - pr.top);
+    else if (pr.bottom > br.bottom) paletteBody.scrollTop += (pr.bottom - br.bottom);
+  }
+
+  function openPalette() {
+    if (!palette) return;
+    palette.hidden = false;
+    document.body.style.overflow = 'hidden';
+    if (paletteInput) { paletteInput.value = ''; }
+    renderPalette('');
+    if (paletteInput) paletteInput.focus();
+  }
+  function closePalette() {
+    if (!palette) return;
+    palette.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  if (searchBtn) searchBtn.addEventListener('click', openPalette);
+  if (palette) {
+    palette.addEventListener('click', function (e) {
+      if (e.target.closest('[data-close]')) closePalette();
+    });
+  }
+  if (paletteInput) {
+    paletteInput.addEventListener('input', function () { renderPalette(paletteInput.value); });
+    paletteInput.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); moveActive(1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); moveActive(-1); }
+      else if (e.key === 'Enter') {
+        var items = $$('.palette-item', paletteBody);
+        var target = items[activeIdx >= 0 ? activeIdx : 0];
+        if (target) { e.preventDefault(); window.location.href = target.getAttribute('href'); }
+      }
+    });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && palette && !palette.hidden) { closePalette(); return; }
+    if (e.key === '/' && palette && palette.hidden) {
+      var tag = (e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+      e.preventDefault();
+      openPalette();
+    }
+  });
+
+  /* 首页搜索区（仅首页存在） */
+  var homeInput = $('#homeSearch');
+  var homeResults = $('#homeResults');
+  if (homeInput && homeResults) {
+    var renderHome = function () {
+      var q = homeInput.value.trim();
+      if (!q) { homeResults.hidden = true; homeResults.innerHTML = ''; return; }
+      var list = search(q);
+      homeResults.hidden = false;
+      homeResults.innerHTML = list.length
+        ? list.map(function (item) {
+            return '<a class="search-result" href="' + item.u + '"><b>' + highlight(item.t, q) +
+                   '</b><span>' + highlight(item.d, q) + '</span></a>';
+          }).join('')
+        : '<div class="search-empty">没有匹配的文档，试试「frontmatter」「触发」「evals」</div>';
+    };
+    homeInput.addEventListener('input', renderHome);
+    homeInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        var first = $('.search-result', homeResults);
+        if (first) { e.preventDefault(); window.location.href = first.getAttribute('href'); }
+      }
+    });
+
+    /* 快捷标签：index.html#q=关键词 直接预填并出结果 */
+    var applyHash = function () {
+      var h = window.location.hash;
+      if (h.indexOf('#q=') !== 0) return;
+      homeInput.value = decodeURIComponent(h.slice(3));
+      renderHome();
+      var block = $('#searchBlock');
+      if (block) block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    window.addEventListener('hashchange', applyHash);
+    applyHash();
+  }
+
+  /* ---------- 8. 滚动显现 ---------- */
+  var reduceMotion = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    var revealTargets = $$('.card, .dirblock, .navcard, .search-block');
+    revealTargets.forEach(function (el, i) {
+      el.classList.add('reveal');
+      el.style.transitionDelay = (i % 3) * 70 + 'ms';
+    });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.03 });
+    revealTargets.forEach(function (el) { io.observe(el); });
+  }
+
+  /* ---------- 初始化 ---------- */
+  syncTopbar();
+  syncToTop();
+  syncSpy();
+  window.addEventListener('load', syncSpy);
+})();
+</script>
 </body>
 </html>

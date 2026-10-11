@@ -4,269 +4,90 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>完整示例 · Agent Skill 规范</title>
+<meta name="description" content="完整示例：真实技能从最小版长成完整版的全过程（待重建）。">
 <link rel="stylesheet" href="skill-spec.css">
 </head>
 <body>
 
-<header class="topbar">
-  <div class="inner">
-    <a class="brand" href="index.html">Agent Skill 规范 <span>/ 目录结构</span></a>
-    <nav class="topnav">
-      <a href="index.html">首页</a>
-      <a href="structure-detail.html">结构详解</a>
-      <a href="skill-md.html">SKILL.md</a>
-      <a href="description.html">描述优化</a>
-      <a href="examples.html" class="active">示例</a>
-      <a href="references.html">references/</a>
-      <a href="scripts.html">scripts/</a>
-      <a href="assets.html">assets/</a>
-      <a href="evals.html">evals/</a>
-      <a href="design.html">设计流程</a>
+<header class="topbar" id="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">AS</span>
+      <span class="brand-text">Agent Skill 规范</span>
+    </a>
+
+    <nav class="topnav" id="topnav" aria-label="站点导航">
+      <div class="navgroup">
+        <button class="navgroup-btn" type="button" aria-expanded="false">核心
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="navgroup-menu">
+          <a href="index.html"><b>首页 · 总览</b><span>什么是 Agent Skill、渐进式加载与目录总览</span></a>
+          <a href="structure-detail.html"><b>目录结构详解</b><span>每个文件装什么、何时被读、为何要单独拆出来</span></a>
+          <a href="skill-md.html"><b>SKILL.md 撰写指南</b><span>frontmatter 逐字段详解、正文结构与写作原则</span></a>
+          <a href="description.html"><b>描述与触发优化</b><span>description 决定触发；五条原则与优化闭环</span></a>
+        </div>
+      </div>
+      <div class="navgroup">
+        <button class="navgroup-btn" type="button" aria-expanded="false">资源
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="navgroup-menu">
+          <a href="references.html"><b>references/ 撰写指南</b><span>主技术参考、领域知识、条件触发文档与 FORMS.md</span></a>
+          <a href="scripts.html"><b>scripts/ 撰写指南</b><span>自包含依赖、非交互、错误自纠与 stdout/stderr 分流</span></a>
+          <a href="assets.html"><b>assets/ 撰写指南</b><span>templates / schemas / data 三类静态资源</span></a>
+          <a href="evals.html"><b>evals/ 撰写指南</b><span>evals.json 结构、用例设计、断言与判分迭代</span></a>
+        </div>
+      </div>
+      <div class="navgroup active">
+        <button class="navgroup-btn" type="button" aria-expanded="false">方法
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="navgroup-menu">
+          <a href="design.html"><b>目录取舍与设计流程</b><span>什么时候才需要哪个目录；六步演进路径</span></a>
+          <a href="examples.html" class="active"><b>完整示例</b><span>真实技能从最小版长成完整版的全过程</span></a>
+        </div>
+      </div>
     </nav>
+
+    <button class="search-btn" id="searchBtn" type="button" aria-label="站内搜索">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="m11 11 3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span class="search-btn-text">搜索</span>
+      <kbd>/</kbd>
+    </button>
+
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="展开导航" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
 
-<div class="wrap">
+<div class="shell">
+  <div class="layout">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head" id="sidebarHead" role="button" tabindex="0" aria-expanded="false">
+        <span>本页目录</span>
+        <span class="sidebar-toggle" aria-hidden="true">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5 6 7.5 9 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </div>
+      <nav class="toc" id="toc" aria-label="本页目录"></nav>
+    </aside>
+
+    <main class="content" id="content">
 
   <div class="crumb"><a href="index.html">首页</a> / 完整示例</div>
-  <h1>完整示例：skill-authoring</h1>
-  <p class="sub">跟着一个<b>真实可用</b>的技能，看它如何从最小版<b>逐阶段生长</b>为完整版。每一步都由一个真实的"痛点"触发——而不是一开始就规划好整棵目录树。</p>
+  <p class="eyebrow">Example</p>
+  <h1>完整示例</h1>
+  <p class="sub">本页将展示一个真实技能从最小版长成完整版的全过程。</p>
 
-  <div class="callout">
-    <b>关于这个示例</b>：<code>skill-authoring</code> 是一个「帮你写 Agent Skill」的技能——它<b>真实存在</b>于本站目录中（<code>skill-authoring/</code>），可以直接安装使用。它确实有点"元"（一个讲怎么写技能的站点里，放了一个帮你写技能的技能），但正因如此，它天然要用到 <code>references/</code>、<code>scripts/</code>、<code>assets/</code>、<code>evals/</code> 全部四类目录，是绝佳的贯穿样例。
-  </div>
-
-  <!-- ===== 阶段 1 ===== -->
-  <h2>阶段 1 · 最小版：只写 SKILL.md</h2>
-  <p class="h2sub">起点要尽可能小。先让它能跑通一个真实任务，不预设任何目录。</p>
   <div class="card tight">
-    <div class="fline"><b>要解决</b><span>用户想新建一个技能，但不知道从哪下手。</span></div>
-    <div class="fline"><b>产出</b><span>一个 <code>SKILL.md</code>：说清技能做什么、何时用，以及最短的操作步骤。</span></div>
-<pre>skill-authoring/
-└── SKILL.md</pre>
-    <h4>SKILL.md（最小版节选）</h4>
-<pre><span class="k">---</span>
-<span class="k">name:</span> skill-authoring
-<span class="k">description:</span> >
-  创建、校验与优化 Agent Skill。当用户想新建一个 skill、
-  校验或调试已有 skill 时使用。
-<span class="k">---</span>
-
-# Skill Authoring
-
-## 何时使用
-当用户想新建 / 校验 / 优化一个 Agent Skill 时。
-
-## 核心流程
-1. 明确技能做什么、何时触发
-2. 创建目录与 SKILL.md
-3. 写 frontmatter（name / description 必需）
-4. 写正文
-5. 校验</pre>
-    <div class="callout good"><b>这一阶段的关键决策：</b>先不建任何子目录。如果技能只需要几十行就能说清，它就该停在这里——<b>不是所有技能都需要长大。</b></div>
-  </div>
-
-  <!-- ===== 阶段 2 ===== -->
-  <h2>阶段 2 · 内容变长 → 拆出 references/</h2>
-  <p class="h2sub">真实痛点：用着用着，正文开始塞不下。</p>
-  <div class="card tight">
-    <div class="fline"><b>触发理由</b><span>为了讲清 frontmatter 每个字段的约束、命名的坑、校验报错怎么修，正文迅速膨胀。而其中<b>大部分内容只在特定情况下才需要</b>（比如"校验失败时"）。</span></div>
-    <div class="fline"><b>做法</b><span>把细节移出去，正文只留主干 + 一张<b>资源路由表</b>。</span></div>
-<pre>skill-authoring/
-├── SKILL.md
-└── references/
-    ├── REFERENCE.md            <span class="c"># 格式规范细则（字段、命名、目录约定）</span>
-    ├── description-guide.md    <span class="c"># 描述写法与触发优化</span>
-    └── validation-errors.md    <span class="c"># 条件触发：校验失败时才读</span></pre>
-    <h4>正文里新增的路由表</h4>
-<pre>## 资源路由表
-| 当任务涉及… | 读取 |
-|---|---|
-| frontmatter 字段、命名、目录约定 | `references/REFERENCE.md` |
-| description 怎么写、如何提高触发率 | `references/description-guide.md` |
-| 校验报错、不知道错在哪 | `references/validation-errors.md` |</pre>
-    <div class="callout warn"><b>注意</b>：<code>validation-errors.md</code> 是<b>条件触发</b>文档——平时完全不加载，只有校验失败时才读。这正是把内容拆出去的价值：省上下文。</div>
-  </div>
-
-  <!-- ===== 阶段 3 ===== -->
-  <h2>阶段 3 · 逻辑重复 → 加 scripts/</h2>
-  <p class="h2sub">真实痛点：agent 每次都在重写同样的逻辑。</p>
-  <div class="card tight">
-    <div class="fline"><b>触发理由</b><span>观察执行轨迹发现：每次新建技能，agent 都要从头拼一遍目录骨架；每次校验，都在临时手写检查脚本。<b>这是"该固化成脚本"的典型信号。</b></span></div>
-    <div class="fline"><b>做法</b><span>把三段重复逻辑写成经过测试的脚本。</span></div>
-<pre>skill-authoring/
-├── SKILL.md
-├── references/  <span class="c">…（不变）</span>
-└── scripts/
-    ├── scaffold.py           <span class="c"># 生成技能骨架</span>
-    ├── validate.py           <span class="c"># 校验技能（优先调用 skills-ref）</span>
-    └── lint_description.py   <span class="c"># 检查描述长度与触发表述</span></pre>
-    <h4>脚本要点（以 validate.py 为例）</h4>
-    <div class="fline"><b>自包含</b><span>用 PEP 723 内联声明依赖，一条命令即可运行。</span></div>
-    <div class="fline"><b>可降级</b><span>优先调用 <code>skills-ref</code>；未安装时退化为内置格式检查，并在输出的 <code>engine</code> 字段标明用的是哪套。</span></div>
-    <div class="fline"><b>结构化输出</b><span>JSON 走 stdout，诊断走 stderr，便于 agent 解析。</span></div>
-<pre>{
-  "valid": true,
-  "engine": "skills-ref",
-  "errors": []
-}</pre>
-  </div>
-
-  <!-- ===== 阶段 4 ===== -->
-  <h2>阶段 4 · 格式要固定 → 加 assets/</h2>
-  <p class="h2sub">真实痛点：骨架和字段清单需要稳定、可复用。</p>
-  <div class="card tight">
-    <div class="fline"><b>触发理由</b><span>骨架模板写在脚本里，改起来麻烦；字段清单反复被引用，却散落在正文各处。</span></div>
-    <div class="fline"><b>做法</b><span>把静态资源抽到 <code>assets/</code>，脚本从中读取。</span></div>
-<pre>skill-authoring/
-├── SKILL.md
-├── references/  <span class="c">…（不变）</span>
-├── scripts/     <span class="c">…（不变）</span>
-└── assets/
-    ├── templates/SKILL.md.template        <span class="c"># 骨架模板（scaffold.py 读取它）</span>
-    ├── schemas/frontmatter.schema.json    <span class="c"># frontmatter 结构定义</span>
-    └── data/field-catalog.json            <span class="c"># 字段速查表</span></pre>
-    <div class="callout"><b>关键点</b>：模板文件名用 <code>SKILL.md.template</code> 而非 <code>SKILL.md</code>——避免它被技能扫描器误认成一个名为 <code>templates</code> 的技能。</div>
-    <div class="fline"><b>脚本真的用了它</b><span><code>scaffold.py</code> 会优先读取 <code>assets/templates/SKILL.md.template</code>，读不到才回退到内置模板。这样 assets 不是摆设。</span></div>
-  </div>
-
-  <!-- ===== 阶段 5 ===== -->
-  <h2>阶段 5 · 要长期维护 → 加 evals/</h2>
-  <p class="h2sub">真实痛点：改动之后，怎么知道没把原来好用的功能改坏？</p>
-  <div class="card tight">
-    <div class="fline"><b>触发理由</b><span>技能要持续维护，需要一组用例来锁定质量、防止回退。</span></div>
-    <div class="fline"><b>做法</b><span>加测试用例与输入素材。</span></div>
-<pre>skill-authoring/
-├── SKILL.md
-├── references/  <span class="c">…（不变）</span>
-├── scripts/     <span class="c">…（不变）</span>
-├── assets/      <span class="c">…（不变）</span>
-└── evals/
-    ├── evals.json
-    └── files/
-        ├── README.md
-        └── my-skill/SKILL.md   <span class="c"># 故意写坏的样例，用于测试校验流程</span></pre>
-    <h4>用例示例</h4>
-<pre>{
-  "id": 2,
-  "prompt": "我按文档写了个 skill，但 skills-ref validate 一直报错，帮我看看哪里不对？",
-  "expected_output": "运行校验、定位具体错误，并给出可执行的修复建议。",
-  "files": ["evals/files/my-skill/SKILL.md"],
-  "assertions": [
-    "实际运行了校验（而非仅凭猜测）",
-    "指出的错误与文件中的真实问题一致",
-    "给出了具体的修复方式"
-  ]
-}</pre>
-    <div class="callout warn"><b>一个坑</b>：<code>evals/files/my-skill/SKILL.md</code> 也是嵌套的 SKILL.md，可能被扫描器当成技能。所以素材目录里放了一份 <code>README.md</code> 明确标注"这是测试素材，不是可安装的技能"。</div>
-  </div>
-
-  <!-- ===== 完整版 ===== -->
-  <h2>完整版总览</h2>
-  <p class="h2sub">五个阶段长完，它变成了这样——一个真实可用、四类目录齐备的技能。</p>
-  <div class="card">
-    <ul class="tree">
-      <li>
-        <div class="row"><span class="nm root">skill-authoring/</span><span class="desc">帮你新建 / 校验 / 优化 Agent Skill</span></div>
-        <ul>
-          <li><div class="row"><span class="nm">SKILL.md</span><span class="badge req">必需</span><span class="desc">入口 + 资源路由表（64 行）</span></div></li>
-          <li>
-            <div class="row"><span class="nm">references/</span><span class="badge opt">可选</span><span class="desc">按需知识库</span></div>
-            <ul>
-              <li><div class="row"><span class="nm">REFERENCE.md</span><span class="desc">格式规范细则</span></div></li>
-              <li><div class="row"><span class="nm">description-guide.md</span><span class="desc">描述写法与触发优化</span></div></li>
-              <li><div class="row"><span class="nm">validation-errors.md</span><span class="desc">条件触发：校验失败时读</span></div></li>
-            </ul>
-          </li>
-          <li>
-            <div class="row"><span class="nm">scripts/</span><span class="badge opt">可选</span><span class="desc">可执行脚本</span></div>
-            <ul>
-              <li><div class="row"><span class="nm">scaffold.py</span><span class="desc">生成技能骨架</span></div></li>
-              <li><div class="row"><span class="nm">validate.py</span><span class="desc">校验（包装 skills-ref）</span></div></li>
-              <li><div class="row"><span class="nm">lint_description.py</span><span class="desc">检查描述质量</span></div></li>
-            </ul>
-          </li>
-          <li>
-            <div class="row"><span class="nm">assets/</span><span class="badge opt">可选</span><span class="desc">静态资源</span></div>
-            <ul>
-              <li><div class="row"><span class="nm">templates/SKILL.md.template</span><span class="desc">骨架模板</span></div></li>
-              <li><div class="row"><span class="nm">schemas/frontmatter.schema.json</span><span class="desc">frontmatter 结构定义</span></div></li>
-              <li><div class="row"><span class="nm">data/field-catalog.json</span><span class="desc">字段速查表</span></div></li>
-            </ul>
-          </li>
-          <li>
-            <div class="row"><span class="nm">evals/</span><span class="badge opt">可选</span><span class="desc">评测</span></div>
-            <ul>
-              <li><div class="row"><span class="nm">evals.json</span><span class="desc">3 条测试用例 + 断言</span></div></li>
-              <li><div class="row"><span class="nm">files/</span><span class="desc">测试素材（含故意写坏的样例）</span></div></li>
-            </ul>
-          </li>
-          <li><div class="row"><span class="nm">README.md</span><span class="badge hum">给人看</span><span class="desc">维护者说明</span></div></li>
-        </ul>
-      </li>
-    </ul>
-  </div>
-
-  <!-- ===== 验证指引 ===== -->
-  <h2>如何验证这个技能真的能用</h2>
-  <p class="h2sub">下面这组命令由你手动执行——它们会证明：格式合规、脚本可跑、示例真实。</p>
-  <div class="card tight">
-    <h4>① 安装校验库（可选，装了 <code>validate.py</code> 会用它）</h4>
-<pre>cd &lt;agentskills&gt;/skills-ref
-python3 -m venv .venv &amp;&amp; source .venv/bin/activate &amp;&amp; pip install -e .</pre>
-
-    <h4>② 校验示例技能本身（预期：<code>"valid": true</code>）</h4>
-<pre>python3 skill-authoring/scripts/validate.py skill-authoring</pre>
-
-    <h4>③ 生成一个新技能骨架，再用同一套工具校验它</h4>
-<pre>python3 skill-authoring/scripts/scaffold.py demo-skill --out /tmp
-python3 skill-authoring/scripts/validate.py /tmp/demo-skill</pre>
-
-    <h4>④ 检查故意写坏的样例——应当报错（证明校验真的在工作）</h4>
-<pre>python3 skill-authoring/scripts/validate.py skill-authoring/evals/files/my-skill
-<span class="c"># 预期：valid = false，并列出 name 大小写/目录名不一致、未定义字段 version 等问题</span>
-
-python3 skill-authoring/scripts/lint_description.py skill-authoring/evals/files/my-skill
-<span class="c"># 预期：对过于笼统的 description 给出 warning</span></pre>
-
-    <div class="callout"><b>判定标准</b>：② 与 ③ 应通过；④ 应<b>失败</b>——第 ④ 步失败恰恰说明校验逻辑有效。</div>
-  </div>
-
-  <!-- 自检 -->
-  <h2>照着做时的自检清单</h2>
-  <div class="card tight">
-    <ul class="checklist">
-      <li>是从<b>最小版</b>起步的，没有一开始就建全套目录</li>
-      <li>每加一个目录，都有<b>具体的触发理由</b>（不是"以后可能用到"）</li>
-      <li>加完 <code>references/</code> 后，<code>SKILL.md</code> 里补上了<b>路由</b></li>
-      <li>加完 <code>scripts/</code> 后，脚本被<b>实际跑过</b></li>
-      <li>加完 <code>assets/</code> 后，资源在路由里写了<b>何时用</b></li>
-      <li>加完 <code>evals/</code> 后，用例的<b>提示词是真实的</b></li>
-      <li>最终 <code>SKILL.md</code> 里没有"偶尔才用"的细节残留</li>
-    </ul>
-  </div>
-
-  <!-- 延伸阅读 -->
-  <h2>延伸阅读</h2>
-  <div class="cards">
-    <a class="navcard" href="skill-md.html">
-      <span class="tag">核心</span>
-      <h3>SKILL.md 撰写指南</h3>
-      <p>示例里每一处正文写法，背后都有对应的方法。</p>
-      <span class="go">查看 →</span>
-    </a>
-    <a class="navcard" href="design.html">
-      <span class="tag">方法</span>
-      <h3>目录取舍与设计流程</h3>
-      <p>示例里那五个阶段，就是这条演进路径的展开。</p>
-      <span class="go">查看 →</span>
-    </a>
-    <a class="navcard" href="structure-detail.html">
-      <span class="tag">总览</span>
-      <h3>目录结构详解</h3>
-      <p>每个目录具体装什么、何时被读。</p>
-      <span class="go">查看 →</span>
-    </a>
+    <div class="callout warn">
+      <b>本页内容已清空，待重建。</b>
+      原示例（<code>skill-authoring</code>）由单方面完成——<b>没有经过「示例要求说明书」的定义，也没有经过验收</b>，不具备作为示例的资格，其内容已移除。
+      <br><br>新的示例将在示例要求确定后重建；<b>页面位置与导航入口已保留</b>。
+    </div>
   </div>
 
   <footer>
@@ -274,6 +95,448 @@ python3 skill-authoring/scripts/lint_description.py skill-authoring/evals/files/
     <span>下一步：<a href="references.html">references/ 撰写指南 →</a></span>
   </footer>
 
+    </main>
+  </div>
 </div>
+
+<!-- 站内搜索面板（全站可用，索引见页内脚本） -->
+<div class="palette" id="palette" hidden>
+  <div class="palette-mask" data-close></div>
+  <div class="palette-box" role="dialog" aria-modal="true" aria-label="站内搜索">
+    <div class="palette-head">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="m11 11 3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input id="paletteInput" type="search" placeholder="搜索文档标题、关键词…" autocomplete="off" spellcheck="false">
+      <button class="palette-esc" type="button" data-close>ESC</button>
+    </div>
+    <div class="palette-body" id="paletteBody"></div>
+    <div class="palette-foot">↑↓ 选择 · Enter 打开 · ESC 关闭</div>
+  </div>
+</div>
+
+<!-- 回到顶部 -->
+<button class="to-top" id="toTop" type="button" aria-label="回到顶部" hidden>
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 13V3.5M8 3.5 4 7.5M8 3.5l4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<script>
+/* ==========================================================================
+   全站交互脚本（内联在各页，保证单页可独立打开）
+   1 顶部导航滚动阴影 · 2 移动端导航 · 3 分组下拉 · 4 侧边目录（生成/折叠/高亮）
+   5 代码块复制 · 6 回到顶部 · 7 站内搜索（面板 + 首页搜索区）
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  var $  = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+  /* ---------- 站内搜索索引（与 README 的页面清单保持同步） ---------- */
+  var SEARCH_INDEX = [
+    { t: '首页 · 总览',            u: 'index.html',            d: '什么是 Agent Skill、渐进式加载、目录结构总览',   k: '首页 总览 渐进式披露 目录结构' },
+    { t: '目录结构详解',            u: 'structure-detail.html', d: '每个文件装什么、何时被读、为何要单独拆出来',       k: '目录 结构 详解 references scripts assets evals agents' },
+    { t: 'SKILL.md 撰写指南',       u: 'skill-md.html',         d: 'frontmatter 逐字段详解、正文结构与写作原则',       k: 'skill.md frontmatter name description license compatibility metadata allowed-tools 正文结构' },
+    { t: '描述与触发优化',          u: 'description.html',      d: 'description 决定触发；五条原则与触发优化闭环',      k: 'description 描述 触发 优化 查询集 触发率 验证集' },
+    { t: 'references/ 撰写指南',    u: 'references.html',       d: '主技术参考、领域知识、条件触发文档与 FORMS.md',     k: 'references reference.md domain forms 领域 参考 条件触发' },
+    { t: 'scripts/ 撰写指南',       u: 'scripts.html',          d: '自包含依赖、非交互、错误自纠与 stdout/stderr 分流', k: 'scripts 脚本 自包含 非交互 help 退出码 dry-run stdout stderr' },
+    { t: 'assets/ 撰写指南',        u: 'assets.html',           d: 'templates / schemas / data 三类静态资源',          k: 'assets templates schemas data 模板 查找表 数据结构' },
+    { t: 'evals/ 撰写指南',         u: 'evals.html',            d: 'evals.json 结构、用例设计、断言与判分迭代',         k: 'evals 评测 断言 用例 判分 迭代' },
+    { t: '目录取舍与设计流程',      u: 'design.html',           d: '什么时候才需要哪个目录；六步演进路径',             k: '设计 流程 取舍 演进 决策 最小可用' },
+    { t: '完整示例',                u: 'examples.html',         d: '真实技能从最小版长成完整版的全过程（待重建）',       k: '示例 example 实战 演进' }
+  ];
+
+  /* ---------- 1 / 6. 顶部导航阴影 + 回到顶部显隐 ---------- */
+  var topbar = $('#topbar');
+  var toTop = $('#toTop');
+
+  function syncTopbar() {
+    if (topbar) topbar.classList.toggle('scrolled', window.scrollY > 8);
+  }
+  function syncToTop() {
+    if (toTop) toTop.hidden = window.scrollY <= 420;
+  }
+  if (toTop) {
+    toTop.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () {
+      syncTopbar(); syncToTop(); syncSpy();
+      ticking = false;
+    });
+  }, { passive: true });
+
+  /* ---------- 2. 移动端导航抽屉 ---------- */
+  var navToggle = $('#navToggle');
+  var topnav = $('#topnav');
+  if (navToggle && topnav) {
+    navToggle.addEventListener('click', function () {
+      var open = topnav.classList.toggle('open');
+      navToggle.classList.toggle('is-open', open);
+      navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+
+  /* ---------- 3. 分组下拉（点击切换；桌面悬停由 CSS 负责） ---------- */
+  function closeGroups() {
+    $$('.navgroup.open').forEach(function (g) {
+      g.classList.remove('open');
+      var b = $('.navgroup-btn', g);
+      if (b) b.setAttribute('aria-expanded', 'false');
+    });
+  }
+  $$('.navgroup-btn').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var group = btn.parentNode;
+      var willOpen = !group.classList.contains('open');
+      closeGroups();
+      if (willOpen) {
+        group.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+  document.addEventListener('click', closeGroups);
+
+  /* ---------- 4. 侧边目录 ---------- */
+  var content = $('#content');
+  var tocBox = $('#toc');
+  var sidebar = $('#sidebar');
+  var sidebarHead = $('#sidebarHead');
+  var spyItems = [];
+
+  if (sidebarHead && sidebar) {
+    var toggleSidebar = function () {
+      var open = sidebar.classList.toggle('open');
+      sidebarHead.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+    sidebarHead.addEventListener('click', toggleSidebar);
+    sidebarHead.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSidebar(); }
+    });
+  }
+
+  if (content && tocBox) {
+    /* 4.1 收集章节：h2 与 .dirblock 为一级，其间的 h3 为二级 */
+    var groups = [];
+    var cursor = null;
+    $$('h2, h3, .dirblock', content).forEach(function (node) {
+      if (node.classList.contains('dirblock')) {
+        var nm = $('.dirtitle .nm', node);
+        groups.push({ el: node, label: nm ? nm.textContent.trim() : '目录', kids: [] });
+        cursor = null;
+      } else if (node.tagName === 'H2') {
+        cursor = { el: node, label: node.textContent.trim(), kids: [] };
+        groups.push(cursor);
+      } else if (node.tagName === 'H3' && cursor) {
+        cursor.kids.push({ el: node, label: node.textContent.trim() });
+      }
+    });
+
+    /* 4.2 渲染目录 */
+    var seq = 0;
+    groups.forEach(function (g) {
+      if (!g.el.id) g.el.id = 'sec-' + (++seq);
+
+      var item = document.createElement('div');
+      item.className = 'toc-item';
+      var row = document.createElement('div');
+      row.className = 'toc-row';
+
+      var link = document.createElement('a');
+      link.className = 'toc-link';
+      link.href = '#' + g.el.id;
+      link.textContent = g.label;
+      link.title = g.label;
+      row.appendChild(link);
+      spyItems.push({ el: g.el, link: link });
+
+      item.appendChild(row);
+
+      if (g.kids.length) {
+        var caret = document.createElement('button');
+        caret.type = 'button';
+        caret.className = 'toc-caret';
+        caret.setAttribute('aria-label', '折叠或展开本节');
+        caret.setAttribute('aria-expanded', 'true');
+        caret.innerHTML = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 4.5 6 7.5 9 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        row.appendChild(caret);
+
+        var sub = document.createElement('div');
+        sub.className = 'toc-sub';
+        g.kids.forEach(function (k) {
+          if (!k.el.id) k.el.id = 'sec-' + (++seq);
+          var ka = document.createElement('a');
+          ka.className = 'toc-link toc-link-sub';
+          ka.href = '#' + k.el.id;
+          ka.textContent = k.label;
+          ka.title = k.label;
+          sub.appendChild(ka);
+          spyItems.push({ el: k.el, link: ka });
+        });
+        item.appendChild(sub);
+
+        caret.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var collapsed = item.classList.toggle('collapsed');
+          caret.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        });
+      }
+
+      tocBox.appendChild(item);
+    });
+
+    /* 4.3 移动端点击目录项后收起面板 */
+    tocBox.addEventListener('click', function (e) {
+      if (e.target.closest('.toc-caret')) return;
+      if (window.innerWidth <= 1024 && sidebar) sidebar.classList.remove('open');
+    });
+
+    /* 4.4 本页无小节时隐藏侧栏，正文单栏居中 */
+    if (!groups.length) {
+      var layout = sidebar ? sidebar.parentNode : null;
+      if (sidebar) sidebar.hidden = true;
+      if (layout) layout.classList.add('no-sidebar');
+    }
+  }
+
+  /* 滚动高亮当前章节 */
+  function syncSpy() {
+    if (!spyItems.length) return;
+
+    var line = window.scrollY + 140;
+    var active = spyItems[0];
+    for (var i = 0; i < spyItems.length; i++) {
+      var top = spyItems[i].el.getBoundingClientRect().top + window.scrollY;
+      if (top <= line) active = spyItems[i];
+    }
+    if (active.link.classList.contains('active')) return;
+
+    spyItems.forEach(function (it) { it.link.classList.toggle('active', it === active); });
+
+    var item = active.link.parentNode;
+    if (item && item.classList.contains('collapsed')) item.classList.remove('collapsed');
+
+    /* 让当前项保持在目录可视区内 */
+    if (tocBox && tocBox.clientHeight > 60 && tocBox.scrollHeight > tocBox.clientHeight + 4) {
+      var lr = active.link.getBoundingClientRect();
+      var cr = tocBox.getBoundingClientRect();
+      var pad = 44;
+      if (lr.top < cr.top + pad) tocBox.scrollTop -= (cr.top + pad - lr.top);
+      else if (lr.bottom > cr.bottom - pad) tocBox.scrollTop += (lr.bottom - cr.bottom + pad);
+    }
+  }
+
+  /* ---------- 5. 代码块复制按钮 ---------- */
+  $$('pre').forEach(function (pre) {
+    if (pre.parentNode && pre.parentNode.classList && pre.parentNode.classList.contains('code-block')) return;
+
+    var box = document.createElement('div');
+    box.className = 'code-block';
+    pre.parentNode.insertBefore(box, pre);
+    box.appendChild(pre);
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'code-copy';
+    btn.textContent = '复制';
+    btn.addEventListener('click', function () {
+      var text = pre.innerText;
+      var done = function () {
+        btn.textContent = '已复制';
+        window.setTimeout(function () { btn.textContent = '复制'; }, 1600);
+      };
+      var fallback = function () {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.top = '-1000px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (err) { /* 忽略 */ }
+        document.body.removeChild(ta);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else {
+        fallback();
+      }
+    });
+    box.appendChild(btn);
+  });
+
+  /* ---------- 7. 站内搜索 ---------- */
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function highlight(text, q) {
+    if (!q) return escapeHtml(text);
+    var i = text.toLowerCase().indexOf(q.toLowerCase());
+    if (i < 0) return escapeHtml(text);
+    return escapeHtml(text.slice(0, i)) + '<mark>' + escapeHtml(text.slice(i, i + q.length)) +
+           '</mark>' + escapeHtml(text.slice(i + q.length));
+  }
+  function search(q) {
+    q = (q || '').trim();
+    if (!q) return SEARCH_INDEX.slice();
+    var lower = q.toLowerCase();
+    return SEARCH_INDEX.filter(function (item) {
+      return (item.t + ' ' + item.d + ' ' + item.k).toLowerCase().indexOf(lower) >= 0;
+    });
+  }
+
+  var palette = $('#palette');
+  var paletteInput = $('#paletteInput');
+  var paletteBody = $('#paletteBody');
+  var searchBtn = $('#searchBtn');
+  var activeIdx = -1;
+
+  function renderPalette(q) {
+    if (!paletteBody) return;
+    activeIdx = -1;
+    var list = search(q);
+    if (!list.length) {
+      paletteBody.innerHTML = '<div class="palette-empty">没有匹配的文档，试试「frontmatter」「触发」「evals」</div>';
+      return;
+    }
+    paletteBody.innerHTML = list.map(function (item) {
+      return '<a class="palette-item" href="' + item.u + '">' +
+             '<b>' + highlight(item.t, q) + '</b><span>' + highlight(item.d, q) + '</span></a>';
+    }).join('');
+  }
+
+  function moveActive(step) {
+    if (!paletteBody) return;
+    var items = $$('.palette-item', paletteBody);
+    if (!items.length) return;
+    var idx = activeIdx + step;
+    if (idx < 0) idx = items.length - 1;
+    if (idx >= items.length) idx = 0;
+    activeIdx = idx;
+    items.forEach(function (el, i) { el.classList.toggle('is-active', i === idx); });
+
+    var pr = items[idx].getBoundingClientRect();
+    var br = paletteBody.getBoundingClientRect();
+    if (pr.top < br.top) paletteBody.scrollTop -= (br.top - pr.top);
+    else if (pr.bottom > br.bottom) paletteBody.scrollTop += (pr.bottom - br.bottom);
+  }
+
+  function openPalette() {
+    if (!palette) return;
+    palette.hidden = false;
+    document.body.style.overflow = 'hidden';
+    if (paletteInput) { paletteInput.value = ''; }
+    renderPalette('');
+    if (paletteInput) paletteInput.focus();
+  }
+  function closePalette() {
+    if (!palette) return;
+    palette.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  if (searchBtn) searchBtn.addEventListener('click', openPalette);
+  if (palette) {
+    palette.addEventListener('click', function (e) {
+      if (e.target.closest('[data-close]')) closePalette();
+    });
+  }
+  if (paletteInput) {
+    paletteInput.addEventListener('input', function () { renderPalette(paletteInput.value); });
+    paletteInput.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); moveActive(1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); moveActive(-1); }
+      else if (e.key === 'Enter') {
+        var items = $$('.palette-item', paletteBody);
+        var target = items[activeIdx >= 0 ? activeIdx : 0];
+        if (target) { e.preventDefault(); window.location.href = target.getAttribute('href'); }
+      }
+    });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && palette && !palette.hidden) { closePalette(); return; }
+    if (e.key === '/' && palette && palette.hidden) {
+      var tag = (e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+      e.preventDefault();
+      openPalette();
+    }
+  });
+
+  /* 首页搜索区（仅首页存在） */
+  var homeInput = $('#homeSearch');
+  var homeResults = $('#homeResults');
+  if (homeInput && homeResults) {
+    var renderHome = function () {
+      var q = homeInput.value.trim();
+      if (!q) { homeResults.hidden = true; homeResults.innerHTML = ''; return; }
+      var list = search(q);
+      homeResults.hidden = false;
+      homeResults.innerHTML = list.length
+        ? list.map(function (item) {
+            return '<a class="search-result" href="' + item.u + '"><b>' + highlight(item.t, q) +
+                   '</b><span>' + highlight(item.d, q) + '</span></a>';
+          }).join('')
+        : '<div class="search-empty">没有匹配的文档，试试「frontmatter」「触发」「evals」</div>';
+    };
+    homeInput.addEventListener('input', renderHome);
+    homeInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        var first = $('.search-result', homeResults);
+        if (first) { e.preventDefault(); window.location.href = first.getAttribute('href'); }
+      }
+    });
+
+    /* 快捷标签：index.html#q=关键词 直接预填并出结果 */
+    var applyHash = function () {
+      var h = window.location.hash;
+      if (h.indexOf('#q=') !== 0) return;
+      homeInput.value = decodeURIComponent(h.slice(3));
+      renderHome();
+      var block = $('#searchBlock');
+      if (block) block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    window.addEventListener('hashchange', applyHash);
+    applyHash();
+  }
+
+  /* ---------- 8. 滚动显现 ---------- */
+  var reduceMotion = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    var revealTargets = $$('.card, .dirblock, .navcard, .search-block');
+    revealTargets.forEach(function (el, i) {
+      el.classList.add('reveal');
+      el.style.transitionDelay = (i % 3) * 70 + 'ms';
+    });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.03 });
+    revealTargets.forEach(function (el) { io.observe(el); });
+  }
+
+  /* ---------- 初始化 ---------- */
+  syncTopbar();
+  syncToTop();
+  syncSpy();
+  window.addEventListener('load', syncSpy);
+})();
+</script>
 </body>
 </html>
