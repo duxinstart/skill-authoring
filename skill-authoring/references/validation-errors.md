@@ -6,10 +6,10 @@
 
 `scripts/validate.py` 的输出里有一个 `engine` 字段：
 
-- `"skills-ref"` —— 用的是官方库，结论权威
-- `"builtin"` —— 官方库未安装，用的是内置格式检查（**只验格式，不验全部规则**）
+- `"skills-ref"` —— 用的是参考库，结论权威
+- `"builtin"` —— 参考库未安装，用的是内置格式检查（**只验格式，不验全部规则**）
 
-若看到 `builtin`，且结果通过但你仍不确定，请安装官方库后重跑：
+若看到 `builtin`，且结果通过但你仍不确定，请安装参考库后重跑：
 
 ```bash
 cd <agentskills>/skills-ref

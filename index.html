@@ -33,6 +33,14 @@
     <p class="sub">一个技能 = 一个文件夹，核心是 <code>SKILL.md</code>。其余目录按需组织、按需加载。本页是总览入口，详细写法见各子页。</p>
   </div>
 
+  <div class="card tight">
+    <h4>怎么用这个站点</h4>
+    <div class="fline"><b>给谁看</b><span>需要<b>自己动手写 Skill</b>、但还没有规范可依、不知道文档该怎么写的开发者。<b>不需要任何前置知识</b>。</span></div>
+    <div class="fline"><b>怎么读</b><span>先看下面的目录总览建立整体印象，再按「详细说明」的卡片顺序逐页读。<b>新手建议按卡片顺序走一遍</b>。</span></div>
+    <div class="fline"><b>目录标记</b><span><span class="badge req">必需</span> 技能运行所必需；<span class="badge opt">可选</span> 按需添加；<span class="badge hum">给人看</span> <b>不进模型上下文</b>。</span></div>
+    <div class="fline"><b>规则标记</b><span><i class="mk hard">硬性</i> 违反会导致技能无法被加载；<i class="mk advice">建议</i> 不做不报错但效果差；<i class="mk exp">实验性</i> 客户端支持不一。</span></div>
+  </div>
+
   <h2>什么是 Agent Skill</h2>
   <p class="muted">Skill 是用于扩展 AI agent 能力的轻量开放格式。它把「程序性知识」和「团队/项目专有上下文」打包成可移植、可版本化的文件夹，agent 按需加载。加载遵循<b>渐进式披露</b>：启动时只读 <code>name</code> + <code>description</code>（约 100 tokens），任务命中时才读整篇 <code>SKILL.md</code>，其余资源（脚本、参考、模板）在真正引用时才加载。</p>
 

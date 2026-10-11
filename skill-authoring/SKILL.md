@@ -1,7 +1,7 @@
 ---
 name: skill-authoring
 description: >
-  创建、校验与优化 Agent Skill——生成合规的技能目录骨架、对照官方格式规范做校验、
+  创建、校验与优化 Agent Skill——生成合规的技能目录骨架、对照格式规范做校验、
   并打磨 description 让技能能被稳定触发。当用户想新建一个 skill、校验或调试已有 skill、
   修复校验不通过的 skill、或改进一个总是不被触发的 skill 时使用，即使用户没有明确说"技能"。
 license: Apache-2.0
@@ -20,7 +20,7 @@ metadata:
 当用户想要：
 
 - **新建**一个 skill（从零搭出目录与 `SKILL.md`）
-- **校验**现有 skill 是否符合官方格式规范
+- **校验**现有 skill 是否符合格式规范
 - **修复**一个"校验不通过"的 skill
 - **优化**一个"总是不被触发"的 skill
 

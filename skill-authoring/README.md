@@ -7,7 +7,7 @@
 ## 它做什么
 
 - **新建**：用 `scripts/scaffold.py` 生成合规的技能骨架
-- **校验**：用 `scripts/validate.py` 对照官方格式规范检查（优先调用官方 `skills-ref`）
+- **校验**：用 `scripts/validate.py` 对照格式规范检查（优先调用 `skills-ref`）
 - **优化描述**：用 `scripts/lint_description.py` 检查 `description` 的触发质量
 
 ## 目录
@@ -35,7 +35,7 @@ skill-authoring/
 ## 安装与使用
 
 ```bash
-# 1) 安装官方校验库（可选，装了 validate.py 会用它）
+# 1) 安装校验库（可选，装了 validate.py 会用它）
 cd <agentskills>/skills-ref
 python3 -m venv .venv && source .venv/bin/activate && pip install -e .
 

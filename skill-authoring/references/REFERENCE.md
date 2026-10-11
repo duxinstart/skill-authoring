@@ -105,7 +105,7 @@ scripts/extract.py
 
 ## 7. 校验
 
-官方参考库：
+参考库：
 
 ```bash
 skills-ref validate ./my-skill
