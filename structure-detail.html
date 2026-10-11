@@ -41,7 +41,7 @@
     <div class="file">
       <div class="fhead"><span class="fname">SKILL.md</span><span class="ftag blue">入口 + 路由</span></div>
       <div class="fline"><b>装什么</b><span>frontmatter（name / description）+ 正文：何时使用 → 快速开始 → 核心流程 → <b>资源路由表</b> → Gotchas。只放「每次运行都要用」的内容。</span></div>
-      <div class="fline"><b>何时读</b><span>技能被激活时<b>整篇</b>加载进上下文——所以必须短（&lt; 500 行 / 5000 tokens）。</span></div>
+      <div class="fline"><b>何时读</b><span>技能被激活时<b>整篇</b>加载进上下文——所以正文只该放每次运行都要用的调度信息，细节外置。</span></div>
       <div class="fline"><b>路由表</b><span>技能命脉。必须写明触发条件，例如「当任务涉及数据库时读 references/database.md」，而不是笼统的「详见 references/」。</span></div>
       <pre><span class="c">## 资源路由表</span>
 | 当任务涉及…        | 读取                                  |
@@ -154,20 +154,46 @@
     </div>
   </div>
 
+  <!-- agents/ -->
+  <div class="dirblock">
+    <div class="dirhead">
+      <div class="dirtitle"><span class="nm">agents/</span><span class="badge opt">可选</span></div>
+      <p class="dirpurpose">存放<b>厂商特定配置</b>——给客户端（harness）读，<b>不是给 agent 读的指令</b>。<b>它不是通用标准</b>：不同客户端认不认、放什么，各不相同，有的客户端根本不看这个目录。</p>
+    </div>
+    <div class="file">
+      <div class="fhead"><span class="fname">*.yaml</span><span class="ftag">厂商配置</span></div>
+      <div class="fline"><b>作用</b><span>承载 UI 元数据、依赖声明、调用策略等——这些属于"产品界面"，而不是"技能内容"。</span></div>
+      <div class="fline"><b>装什么</b><span>显示名 / 短描述 / 图标 / 品牌色 / 默认提示语；<b>依赖声明</b>；<b>调用策略</b>。</span></div>
+      <div class="fline"><b>要点</b><span>只放当前客户端支持的字段；换客户端可能不生效。<b>不要把该给 agent 的指令放这里</b>——agent 不读它。</span></div>
+    </div>
+    <div class="file">
+      <div class="fhead"><span class="fname">调用策略</span><span class="ftag">显式调用 vs 自动触发</span></div>
+      <div class="fline"><b>默认</b><span>技能进入候选池，agent 按 <code>description</code> <b>自动</b>判断是否加载。</span></div>
+      <div class="fline"><b>改为显式</b><span>可配置为<b>不自动加载</b>——技能不进模型上下文，只能由用户<b>显式点名</b>调用。</span></div>
+      <div class="fline"><b>什么时候用</b><span>技能带副作用，或你希望"只在明确需要时才用"时。<b>这类策略属于客户端配置，不要靠描述里的措辞去实现。</b></span></div>
+    </div>
+    <div class="file">
+      <div class="fhead"><span class="fname">依赖声明</span><span class="ftag">需要外部服务时</span></div>
+      <div class="fline"><b>作用</b><span>声明技能需要的外部工具 / 服务（例如某个 MCP 服务），让客户端在加载前知道要先接好。</span></div>
+      <div class="fline"><b>与正文的分工</b><span><b>这里声明"需要什么"，正文的"依赖"一节说明"怎么用"</b>。字段格式因客户端而异。</span></div>
+    </div>
+  </div>
+
   <!-- 给人看 -->
   <div class="dirblock">
     <div class="dirhead">
-      <div class="dirtitle"><span class="nm">README.md · LICENSE · CHANGELOG.md</span><span class="badge hum">给人看</span></div>
-      <p class="dirpurpose">规范允许技能目录里放任意文件。这些是<b>给维护者看的</b>，<b>不参与渐进式加载</b>——agent 不会读它们。</p>
+      <div class="dirtitle"><span class="nm">README / LICENSE / CHANGELOG</span><span class="badge hum">通常不必加</span></div>
+      <p class="dirpurpose">规范允许技能目录里放任意文件。但<b>除非有明确的打包或分发要求，否则不要默认添加这些</b>——它们对 agent 的行为没有任何影响，只会让目录变乱。</p>
     </div>
     <div class="file">
-      <div class="fhead"><span class="fname">README.md</span><span class="ftag gray">维护者说明</span></div>
-      <div class="fline"><b>作用</b><span>技能背景、安装方式、贡献指南、设计取舍。</span></div>
-      <div class="fline"><b>陷阱</b><span><b>不要把该给 agent 的指令写进 README.md</b>——模型根本不读它。</span></div>
+      <div class="fhead"><span class="fname">什么时候才加</span><span class="ftag gray">按需</span></div>
+      <div class="fline"><b>LICENSE</b><span>要对外分发时才需要；也可只在 frontmatter 的 <code>license</code> 字段里写许可证名。</span></div>
+      <div class="fline"><b>README</b><span>只有需要向人类读者交代背景、安装或贡献方式时才加。</span></div>
+      <div class="fline"><b>CHANGELOG</b><span>只有需要对外维护版本记录时才加。</span></div>
     </div>
     <div class="file">
-      <div class="fhead"><span class="fname">LICENSE / CHANGELOG.md</span><span class="ftag gray">合规与版本</span></div>
-      <div class="fline"><b>作用</b><span>LICENSE 声明许可证（可在 frontmatter 的 <code>license</code> 字段引用）；CHANGELOG.md 记录版本变更。</span></div>
+      <div class="fhead"><span class="fname">一个常见错误</span><span class="ftag gray">陷阱</span></div>
+      <div class="fline"><b>别把指令写进 README</b><span><b>agent 根本不读 README。</b>任何"希望 agent 照做"的内容，都必须写进 <code>SKILL.md</code> 或它引用的文件。</span></div>
     </div>
   </div>
 

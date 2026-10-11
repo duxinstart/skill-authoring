@@ -34,7 +34,7 @@
   </div>
 
   <h2>什么是 Agent Skill</h2>
-  <p class="muted">Skill 是用于扩展 AI agent 能力的轻量开放格式。它把「程序性知识」和「团队/项目专有上下文」打包成可移植、可版本化的文件夹，agent 按需加载。加载遵循<b>渐进式披露</b>：启动时只读 <code>name</code> + <code>description</code>（约 100 tokens），任务命中时才读整篇 <code>SKILL.md</code>（建议 &lt; 5000 tokens），其余资源（脚本、参考、模板）在真正引用时才加载。</p>
+  <p class="muted">Skill 是用于扩展 AI agent 能力的轻量开放格式。它把「程序性知识」和「团队/项目专有上下文」打包成可移植、可版本化的文件夹，agent 按需加载。加载遵循<b>渐进式披露</b>：启动时只读 <code>name</code> + <code>description</code>（约 100 tokens），任务命中时才读整篇 <code>SKILL.md</code>，其余资源（脚本、参考、模板）在真正引用时才加载。</p>
 
   <h2>目录结构总览</h2>
   <div class="legend">
@@ -47,7 +47,7 @@
       <li>
         <div class="row"><span class="nm root">skill-name/</span><span class="desc">技能根目录 · 目录名 = 技能名（kebab-case）</span></div>
         <ul>
-          <li><div class="row"><span class="nm">SKILL.md</span><span class="badge req">必需</span><span class="desc">入口 + 资源路由表（&lt; 500 行 / 5000 tokens）</span></div></li>
+          <li><div class="row"><span class="nm">SKILL.md</span><span class="badge req">必需</span><span class="desc">入口 + 资源路由表</span></div></li>
           <li>
             <div class="row"><span class="nm">references/</span><span class="badge opt">可选</span><span class="desc">按需加载的知识库</span></div>
             <ul>
@@ -79,9 +79,13 @@
               <li><div class="row"><span class="nm">files/</span><span class="desc">测试输入文件</span></div></li>
             </ul>
           </li>
-          <li><div class="row"><span class="nm">README.md</span><span class="badge hum">给人看</span><span class="desc">维护者说明</span></div></li>
-          <li><div class="row"><span class="nm">LICENSE</span><span class="badge hum">给人看</span><span class="desc">许可证</span></div></li>
-          <li><div class="row"><span class="nm">CHANGELOG.md</span><span class="badge hum">给人看</span><span class="desc">版本记录</span></div></li>
+          <li>
+            <div class="row"><span class="nm">agents/</span><span class="badge opt">可选</span><span class="desc">厂商特定配置 · 非标准</span></div>
+            <ul>
+              <li><div class="row"><span class="nm">*.yaml</span><span class="desc">UI 元数据 / 依赖 / 调用策略</span></div></li>
+            </ul>
+          </li>
+          <li><div class="row"><span class="nm">README / LICENSE / CHANGELOG</span><span class="badge hum">给人看</span><span class="desc">通常不必加；有分发要求时才用</span></div></li>
         </ul>
       </li>
     </ul>
@@ -99,7 +103,7 @@
     <a class="navcard" href="skill-md.html">
       <span class="tag">核心</span>
       <h3>SKILL.md 撰写指南</h3>
-      <p>frontmatter 逐字段详解、正文结构（官方口径 + 建议模板）、写作原则、常用模式、交付前自检清单。全文三色标注硬性/建议/实验性。</p>
+      <p>frontmatter 逐字段详解、正文结构（官方口径 + 19 份真实技能的实证频率）、写作原则、常用模式、交付前自检清单。全文三色标注硬性/建议/实验性。</p>
       <span class="go">查看 →</span>
     </a>
     <a class="navcard" href="description.html">

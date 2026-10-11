@@ -38,7 +38,7 @@
     <table>
       <tr><th style="width:140px">目录 / 文件</th><th style="width:70px">必需性</th><th>什么时候才需要它</th></tr>
       <tr><td><code>SKILL.md</code></td><td><span class="badge req">必需</span></td><td>永远需要。没有它就不是一个技能。</td></tr>
-      <tr><td><code>references/</code></td><td><span class="badge opt">可选</span></td><td>当 <code>SKILL.md</code> 会超过 500 行 / 5000 tokens，或存在"只有特定情况才用得上"的详细知识（领域规则、API 细节、错误表）时。</td></tr>
+      <tr><td><code>references/</code></td><td><span class="badge opt">可选</span></td><td>当 <code>SKILL.md</code> 装不下、或存在"只有特定情况才用得上"的详细知识（领域规则、API 细节、错误表）时。</td></tr>
       <tr><td><code>scripts/</code></td><td><span class="badge opt">可选</span></td><td>当存在<b>确定性、可重复、agent 每次都要重新实现</b>的操作时（解析格式、生成图表、校验产物）。</td></tr>
       <tr><td><code>assets/</code></td><td><span class="badge opt">可选</span></td><td>当需要<b>固定的输出模板</b>、<b>数据结构定义</b>，或<b>静态查找表</b>时。</td></tr>
       <tr><td><code>evals/</code></td><td><span class="badge opt">可选</span></td><td>当技能需要<b>长期维护、验证质量</b>，或要与"没有技能时"对比效果时。</td></tr>
@@ -62,7 +62,7 @@
       </div>
       <div class="step">
         <h4>内容变长 → 拆出 references/</h4>
-        <p>当 SKILL.md 逼近 500 行，把"详细知识"移出去，并在 SKILL.md 留一张<b>路由表</b>指明何时加载。</p>
+        <p>当 SKILL.md 里的"详细知识"越积越多，把它移出去，并在 SKILL.md 留一张<b>路由表</b>指明何时加载。</p>
       </div>
       <div class="step">
         <h4>逻辑重复 → 加 scripts/</h4>
